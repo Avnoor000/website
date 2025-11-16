@@ -1,68 +1,1062 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>City Shooter</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      text-align: center;
-      background-color: #1a1a1a;
-      color: #e0e0e0;
-      margin: 50px;
-    }
-    h1 {
-      color: #ffffff;
-    }
-    h2 {
-      color: #ffffff;
-    }
-    p {
-      color: #b0b0b0;
-    }
-    button {
-      background-color: #2196F3;
-      color: white;
-      border: none;
-      padding: 10px 20px;
-      border-radius: 5px;
-      cursor: pointer;
-    }
-    button:hover {
-      background-color: #45a049;
-    }
-    .download-section {
-      margin-top: 40px;
-      padding: 20px;
-      background-color: #2a2a2a;
-      border-radius: 10px;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.5);
-      max-width: 500px;
-      margin-left: auto;
-      margin-right: auto;
-      border: 1px solid #3a3a3a;
-    }
-    .download-btn {
-      background-color: #2196F3;
-      margin-top: 15px;
-    }
-    .download-btn:hover {
-      background-color: #0b7dda;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Impostor Game - Fruits</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 600px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        h1 {
+            color: #667eea;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+        }
+
+        .screen {
+            display: none;
+        }
+
+        .screen.active {
+            display: block;
+            animation: fadeIn 0.3s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 600;
+        }
+
+        input, textarea {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+            font-family: inherit;
+        }
+
+        input:focus, textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        button {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        button:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            margin-top: 10px;
+        }
+
+        .room-code {
+            background: #f0f0f0;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .room-code h2 {
+            color: #667eea;
+            font-size: 2em;
+            letter-spacing: 5px;
+        }
+
+        .players-list {
+            background: #f9f9f9;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .player-item {
+            background: white;
+            padding: 12px;
+            margin: 8px 0;
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .player-name {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .host-badge {
+            background: #ffd700;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .word-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 60px 40px;
+            border-radius: 20px;
+            text-align: center;
+            margin: 30px 0;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        .word-card h2 {
+            font-size: 3em;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+        }
+
+        .impostor-card {
+            background: linear-gradient(135deg, #f5576c 0%, #c92a3e 100%);
+        }
+
+        .info-text {
+            text-align: center;
+            color: #666;
+            margin: 20px 0;
+            font-size: 14px;
+        }
+
+        .game-stats {
+            display: flex;
+            justify-content: space-around;
+            margin: 20px 0;
+            padding: 20px;
+            background: #f9f9f9;
+            border-radius: 10px;
+        }
+
+        .stat {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 2em;
+            font-weight: 700;
+            color: #667eea;
+        }
+
+        .stat-label {
+            color: #888;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+
+        .timer {
+            font-size: 1.5em;
+            font-weight: 700;
+            color: #667eea;
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .chat-container {
+            background: #f9f9f9;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .chat-messages {
+            max-height: 300px;
+            overflow-y: auto;
+            margin-bottom: 15px;
+            padding: 10px;
+            background: white;
+            border-radius: 8px;
+        }
+
+        .message {
+            padding: 10px;
+            margin: 8px 0;
+            border-radius: 8px;
+            background: #e8eaf6;
+        }
+
+        .message-author {
+            font-weight: 600;
+            color: #667eea;
+            margin-bottom: 5px;
+        }
+
+        .message-text {
+            color: #333;
+        }
+
+        .current-turn {
+            background: #fff3cd;
+            border: 2px solid #ffc107;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            margin: 15px 0;
+            font-weight: 600;
+            color: #856404;
+        }
+
+        .your-turn {
+            background: #d4edda;
+            border-color: #28a745;
+            color: #155724;
+        }
+
+        .vote-section {
+            background: #f9f9f9;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .vote-option {
+            background: white;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 8px;
+            border: 2px solid #e0e0e0;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+        }
+
+        .vote-option:hover {
+            border-color: #667eea;
+            transform: translateX(5px);
+        }
+
+        .vote-option.selected {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        .vote-radio {
+            margin-right: 15px;
+        }
+
+        .result-card {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+            margin: 20px 0;
+            border: 3px solid #e0e0e0;
+        }
+
+        .result-card.impostor-caught {
+            border-color: #28a745;
+            background: #d4edda;
+        }
+
+        .result-card.impostor-escaped {
+            border-color: #dc3545;
+            background: #f8d7da;
+        }
+
+        .result-title {
+            font-size: 2em;
+            font-weight: 700;
+            margin-bottom: 15px;
+        }
+
+        .result-player {
+            font-size: 1.5em;
+            color: #667eea;
+            margin: 10px 0;
+        }
+
+        .countdown {
+            font-size: 3em;
+            font-weight: 700;
+            color: #667eea;
+            text-align: center;
+            margin: 30px 0;
+        }
+
+        .round-indicator {
+            background: #667eea;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 20px;
+            text-align: center;
+            margin: 15px 0;
+            font-weight: 600;
+        }
+    </style>
 </head>
 <body>
+    <div class="container">
+        <!-- Home Screen -->
+        <div id="homeScreen" class="screen active">
+            <h1>🍎 Impostor Game</h1>
+            <p class="info-text">Fruits Edition - Find the Impostor!</p>
+            
+            <div class="input-group">
+                <label>Your Name</label>
+                <input type="text" id="playerName" placeholder="Enter your name" maxlength="20">
+            </div>
 
-  <h1>City Shooter</h1>
+            <button onclick="createRoom()">Create Room</button>
+            <button onclick="showJoinScreen()" class="btn-secondary">Join Room</button>
+        </div>
 
-  <div class="download-section">
-    <h2>Download Game</h2>
-    <p>Click the button below to download City Shooter.</p>
-    <a href="./citygame.zip" download="citygame.zip">
-      <button class="download-btn">📥 Download City Shooter</button>
-    </a>
-  </div>
+        <!-- Join Room Screen -->
+        <div id="joinScreen" class="screen">
+            <h1>Join Room</h1>
+            
+            <div class="input-group">
+                <label>Your Name</label>
+                <input type="text" id="joinPlayerName" placeholder="Enter your name" maxlength="20">
+            </div>
 
+            <div class="input-group">
+                <label>Room Code</label>
+                <input type="text" id="roomCode" placeholder="Enter 6-digit code" maxlength="6">
+            </div>
+
+            <button onclick="joinRoom()">Join Room</button>
+            <button onclick="showHomeScreen()" class="btn-secondary">Back</button>
+        </div>
+
+        <!-- Lobby Screen -->
+        <div id="lobbyScreen" class="screen">
+            <h1>Lobby</h1>
+            
+            <div class="room-code">
+                <p style="color: #888; margin-bottom: 10px;">Room Code</p>
+                <h2 id="displayRoomCode">------</h2>
+            </div>
+
+            <div class="game-stats">
+                <div class="stat">
+                    <div class="stat-value" id="playerCount">0</div>
+                    <div class="stat-label">Players</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-value">1</div>
+                    <div class="stat-label">Impostor</div>
+                </div>
+            </div>
+
+            <div class="players-list" id="playersList"></div>
+
+            <div id="hostControls" style="display: none;">
+                <div class="input-group">
+                    <label>Number of Discussion Rounds</label>
+                    <select id="roundsSelect" style="padding: 12px; border-radius: 8px; border: 2px solid #e0e0e0; font-size: 16px;">
+                        <option value="1">1 Round</option>
+                        <option value="2">2 Rounds</option>
+                        <option value="3" selected>3 Rounds</option>
+                        <option value="4">4 Rounds</option>
+                        <option value="5">5 Rounds</option>
+                    </select>
+                </div>
+                <button onclick="startGame()">Start Game</button>
+            </div>
+            
+            <button onclick="leaveRoom()" class="btn-secondary">Leave Room</button>
+        </div>
+
+        <!-- Countdown Screen -->
+        <div id="countdownScreen" class="screen">
+            <h1>Game Starting...</h1>
+            <div class="countdown" id="countdownTimer">10</div>
+            <p class="info-text">Memorize your word!</p>
+            <div id="countdownWordDisplay" class="word-card">
+                <h2>?????</h2>
+            </div>
+        </div>
+
+        <!-- Discussion Screen -->
+        <div id="discussionScreen" class="screen">
+            <h1>Discussion</h1>
+            
+            <div class="round-indicator" id="roundIndicator">Round 1 of 3</div>
+
+            <div class="current-turn" id="turnIndicator">
+                Waiting for turn...
+            </div>
+
+            <div class="chat-container">
+                <div class="chat-messages" id="chatMessages"></div>
+                
+                <div id="messageInputArea" style="display: none;">
+                    <textarea id="messageInput" rows="3" placeholder="Type your message..." maxlength="200"></textarea>
+                    <button onclick="sendMessage()" style="margin-top: 10px;">Send Message</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Voting Screen -->
+        <div id="votingScreen" class="screen">
+            <h1>Vote Out the Impostor</h1>
+            
+            <p class="info-text">Choose who you think is the impostor</p>
+
+            <div class="vote-section" id="voteOptions"></div>
+
+            <button onclick="submitVote()" id="submitVoteBtn">Submit Vote</button>
+        </div>
+
+        <!-- Results Screen -->
+        <div id="resultsScreen" class="screen">
+            <h1>Results</h1>
+            
+            <div id="resultDisplay" class="result-card">
+                <div class="result-title">Eliminated</div>
+                <div class="result-player" id="eliminatedPlayer">-</div>
+                <p id="resultMessage"></p>
+            </div>
+
+            <div id="impostorReveal" class="result-card impostor-card" style="display: none;">
+                <div class="result-title">The Impostor Was...</div>
+                <div class="result-player" id="actualImpostor" style="color: white;">-</div>
+                <p style="color: white; margin-top: 15px;">The word was: <strong id="revealWord">-</strong></p>
+            </div>
+
+            <button onclick="continueAfterResults()" id="continueBtn">Continue</button>
+        </div>
+    </div>
+
+    <script>
+        // Game state
+        let gameState = {
+            roomCode: null,
+            playerName: null,
+            isHost: false,
+            players: [],
+            currentWord: null,
+            isImpostor: false,
+            phase: 'lobby', // lobby, countdown, discussion, voting, results
+            currentRound: 0,
+            maxRounds: 3,
+            currentTurnIndex: 0,
+            messages: [],
+            votes: {},
+            eliminated: []
+        };
+
+        // Fruit words
+        const fruits = [
+            'APPLE', 'BANANA', 'ORANGE', 'GRAPE', 'MANGO',
+            'STRAWBERRY', 'WATERMELON', 'PINEAPPLE', 'CHERRY', 'PEACH',
+            'KIWI', 'PAPAYA', 'LEMON', 'LIME', 'PLUM'
+        ];
+
+        // Local storage helpers
+        function getGameRooms() {
+            return JSON.parse(localStorage.getItem('impostorRooms') || '{}');
+        }
+
+        function saveGameRooms(rooms) {
+            localStorage.setItem('impostorRooms', JSON.stringify(rooms));
+        }
+
+        function generateRoomCode() {
+            return Math.floor(100000 + Math.random() * 900000).toString();
+        }
+
+        // Screen navigation
+        function showScreen(screenId) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById(screenId).classList.add('active');
+        }
+
+        function showHomeScreen() {
+            showScreen('homeScreen');
+        }
+
+        function showJoinScreen() {
+            showScreen('joinScreen');
+        }
+
+        // Create room
+        function createRoom() {
+            const name = document.getElementById('playerName').value.trim();
+            if (!name) {
+                alert('Please enter your name!');
+                return;
+            }
+
+            const roomCode = generateRoomCode();
+            const rooms = getGameRooms();
+
+            rooms[roomCode] = {
+                host: name,
+                players: [{ name: name, id: Date.now() }],
+                started: false,
+                phase: 'lobby'
+            };
+
+            saveGameRooms(rooms);
+
+            gameState.roomCode = roomCode;
+            gameState.playerName = name;
+            gameState.isHost = true;
+            gameState.players = rooms[roomCode].players;
+
+            document.getElementById('displayRoomCode').textContent = roomCode;
+            document.getElementById('hostControls').style.display = 'block';
+            
+            updatePlayersList();
+            showScreen('lobbyScreen');
+            startLobbyPolling();
+        }
+
+        // Join room
+        function joinRoom() {
+            const name = document.getElementById('joinPlayerName').value.trim();
+            const code = document.getElementById('roomCode').value.trim();
+
+            if (!name) {
+                alert('Please enter your name!');
+                return;
+            }
+
+            if (!code || code.length !== 6) {
+                alert('Please enter a valid 6-digit room code!');
+                return;
+            }
+
+            const rooms = getGameRooms();
+            
+            if (!rooms[code]) {
+                alert('Room not found!');
+                return;
+            }
+
+            if (rooms[code].started) {
+                alert('Game already started!');
+                return;
+            }
+
+            rooms[code].players.push({ name: name, id: Date.now() });
+            saveGameRooms(rooms);
+
+            gameState.roomCode = code;
+            gameState.playerName = name;
+            gameState.isHost = false;
+            gameState.players = rooms[code].players;
+
+            document.getElementById('displayRoomCode').textContent = code;
+            document.getElementById('hostControls').style.display = 'none';
+            
+            updatePlayersList();
+            showScreen('lobbyScreen');
+            startLobbyPolling();
+        }
+
+        // Update players list
+        function updatePlayersList() {
+            const rooms = getGameRooms();
+            const room = rooms[gameState.roomCode];
+            
+            if (!room) return;
+
+            gameState.players = room.players;
+            
+            const listHtml = room.players.map(player => `
+                <div class="player-item">
+                    <span class="player-name">${player.name}</span>
+                    ${player.name === room.host ? '<span class="host-badge">HOST</span>' : ''}
+                </div>
+            `).join('');
+
+            document.getElementById('playersList').innerHTML = listHtml;
+            document.getElementById('playerCount').textContent = room.players.length;
+        }
+
+        // Polling
+        let pollInterval;
+        function startLobbyPolling() {
+            pollInterval = setInterval(() => {
+                const rooms = getGameRooms();
+                const room = rooms[gameState.roomCode];
+                
+                if (!room) {
+                    clearInterval(pollInterval);
+                    alert('Room closed!');
+                    showHomeScreen();
+                    return;
+                }
+
+                updatePlayersList();
+
+                if (room.started && gameState.phase === 'lobby') {
+                    clearInterval(pollInterval);
+                    loadGameState();
+                    startCountdown();
+                }
+            }, 1000);
+        }
+
+        function startGamePolling() {
+            pollInterval = setInterval(() => {
+                const rooms = getGameRooms();
+                const room = rooms[gameState.roomCode];
+                
+                if (!room) return;
+
+                // Update based on phase
+                if (room.phase === 'discussion' && gameState.phase === 'discussion') {
+                    updateDiscussion();
+                } else if (room.phase === 'voting' && gameState.phase !== 'voting') {
+                    gameState.phase = 'voting';
+                    showVotingScreen();
+                } else if (room.phase === 'results' && gameState.phase !== 'results') {
+                    gameState.phase = 'results';
+                    showResults();
+                }
+            }, 500);
+        }
+
+        // Start game
+        function startGame() {
+            const rooms = getGameRooms();
+            const room = rooms[gameState.roomCode];
+
+            if (room.players.length < 3) {
+                alert('Need at least 3 players!');
+                return;
+            }
+
+            const maxRounds = parseInt(document.getElementById('roundsSelect').value);
+            const word = fruits[Math.floor(Math.random() * fruits.length)];
+            const impostorIndex = Math.floor(Math.random() * room.players.length);
+
+            room.started = true;
+            room.word = word;
+            room.impostorId = room.players[impostorIndex].id;
+            room.impostorName = room.players[impostorIndex].name;
+            room.phase = 'countdown';
+            room.currentRound = 1;
+            room.maxRounds = maxRounds;
+            room.currentTurnIndex = 0;
+            room.roundStartPlayer = 0;
+            room.messages = [];
+            room.votes = {};
+            room.eliminated = [];
+
+            saveGameRooms(rooms);
+            clearInterval(pollInterval);
+            
+            gameState.maxRounds = maxRounds;
+            loadGameState();
+            startCountdown();
+        }
+
+        // Load game state
+        function loadGameState() {
+            const rooms = getGameRooms();
+            const room = rooms[gameState.roomCode];
+            
+            if (!room) return;
+
+            const myPlayer = room.players.find(p => p.name === gameState.playerName);
+            gameState.isImpostor = myPlayer && myPlayer.id === room.impostorId;
+            gameState.currentWord = room.word;
+            gameState.currentRound = room.currentRound || 1;
+            gameState.maxRounds = room.maxRounds || 3;
+            gameState.phase = room.phase;
+        }
+
+        // Countdown
+        function startCountdown() {
+            loadGameState();
+            
+            const wordCard = document.getElementById('countdownWordDisplay');
+            
+            if (gameState.isImpostor) {
+                wordCard.innerHTML = '<h2>IMPOSTOR</h2><p style="margin-top: 15px;">You don\'t know the word!</p>';
+                wordCard.classList.add('impostor-card');
+            } else {
+                wordCard.innerHTML = `<h2>${gameState.currentWord}</h2>`;
+                wordCard.classList.remove('impostor-card');
+            }
+
+            showScreen('countdownScreen');
+
+            let countdown = 10;
+            document.getElementById('countdownTimer').textContent = countdown;
+
+            const countInterval = setInterval(() => {
+                countdown--;
+                document.getElementById('countdownTimer').textContent = countdown;
+
+                if (countdown <= 0) {
+                    clearInterval(countInterval);
+                    
+                    if (gameState.isHost) {
+                        const rooms = getGameRooms();
+                        rooms[gameState.roomCode].phase = 'discussion';
+                        saveGameRooms(rooms);
+                    }
+                    
+                    gameState.phase = 'discussion';
+                    showDiscussionScreen();
+                    startGamePolling();
+                }
+            }, 1000);
+        }
+
+        // Discussion
+        function showDiscussionScreen() {
+            document.getElementById('roundIndicator').textContent = `Round ${gameState.currentRound} of ${gameState.maxRounds}`;
+            showScreen('discussionScreen');
+            updateDiscussion();
+        }
+
+        function updateDiscussion() {
+            const rooms = getGameRooms();
+            const room = rooms[gameState.roomCode];
+            
+            if (!room) return;
+
+            // Update messages
+            const messagesHtml = room.messages.map(msg => `
+                <div class="message">
+                    <div class="message-author">${msg.author}</div>
+                    <div class="message-text">${msg.text}</div>
+                </div>
+            `).join('');
+            document.getElementById('chatMessages').innerHTML = messagesHtml;
+            
+            // Scroll to bottom
+            const chatDiv = document.getElementById('chatMessages');
+            chatDiv.scrollTop = chatDiv.scrollHeight;
+
+            // Update turn - calculate based on round start player
+            const activePlayers = room.players.filter(p => !room.eliminated.includes(p.name));
+            const turnOffset = room.currentTurnIndex % activePlayers.length;
+            const currentPlayerIndex = (room.roundStartPlayer + turnOffset) % activePlayers.length;
+            const currentPlayer = activePlayers[currentPlayerIndex];
+            
+            const turnDiv = document.getElementById('turnIndicator');
+            const inputArea = document.getElementById('messageInputArea');
+            
+            if (currentPlayer.name === gameState.playerName) {
+                turnDiv.textContent = "Your turn to speak!";
+                turnDiv.classList.add('your-turn');
+                inputArea.style.display = 'block';
+            } else {
+                turnDiv.textContent = `${currentPlayer.name}'s turn to speak`;
+                turnDiv.classList.remove('your-turn');
+                inputArea.style.display = 'none';
+            }
+        }
+
+        function sendMessage() {
+            const input = document.getElementById('messageInput');
+            const text = input.value.trim();
+            
+            if (!text) return;
+
+            const rooms = getGameRooms();
+            const room = rooms[gameState.roomCode];
+
+            room.messages.push({
+                author: gameState.playerName,
+                text: text
+            });
+
+            // Move to next turn
+            room.currentTurnIndex++;
+            
+            // Check if round is complete (back to starting player)
+            const activePlayers = room.players.filter(p => !room.eliminated.includes(p.name));
+            const turnsInRound = activePlayers.length;
+            
+            if (room.currentTurnIndex % turnsInRound === 0 && room.currentTurnIndex > 0) {
+                // Round complete
+                if (room.currentRound >= room.maxRounds) {
+                    // All rounds done - move to voting
+                    room.phase = 'voting';
+                    room.votes = {};
+                } else {
+                    // Start next round
+                    room.currentRound++;
+                    room.roundStartPlayer = 0; // Start from first player again
+                }
+            }
+
+            saveGameRooms(rooms);
+            input.value = '';
+            updateDiscussion();
+        }
+
+        // Voting
+        function showVotingScreen() {
+            const rooms = getGameRooms();
+            const room = rooms[gameState.roomCode];
+            
+            const activePlayers = room.players.filter(p => !room.eliminated.includes(p.name));
+            
+            const optionsHtml = activePlayers.map(player => `
+                <div class="vote-option" onclick="selectVote('${player.name}')">
+                    <input type="radio" name="vote" value="${player.name}" class="vote-radio">
+                    <span>${player.name}</span>
+                </div>
+            `).join('');
+
+            document.getElementById('voteOptions').innerHTML = optionsHtml;
+            showScreen('votingScreen');
+        }
+
+        let selectedVote = null;
+        function selectVote(playerName) {
+            selectedVote = playerName;
+            document.querySelectorAll('.vote-option').forEach(opt => {
+                opt.classList.remove('selected');
+            });
+            event.currentTarget.classList.add('selected');
+        }
+
+        function submitVote() {
+            if (!selectedVote) {
+                alert('Please select a player!');
+                return;
+            }
+
+            const rooms = getGameRooms();
+            const room = rooms[gameState.roomCode];
+
+            if (!room.votes) room.votes = {};
+            room.votes[gameState.playerName] = selectedVote;
+
+            saveGameRooms(rooms);
+
+            // Check if everyone voted
+            const activePlayers = room.players.filter(p => !room.eliminated.includes(p.name));
+            if (Object.keys(room.votes).length >= activePlayers.length) {
+                if (gameState.isHost) {
+                    calculateResults();
+                }
+            }
+
+            document.getElementById('submitVoteBtn').disabled = true;
+            document.getElementById('submitVoteBtn').textContent = 'Waiting for others...';
+        }
+
+        function calculateResults() {
+            const rooms = getGameRooms();
+            const room = rooms[gameState.roomCode];
+
+            // Count votes
+            const voteCounts = {};
+            Object.values(room.votes).forEach(vote => {
+                voteCounts[vote] = (voteCounts[vote] || 0) + 1;
+            });
+
+            // Find player with most votes
+            let maxVotes = 0;
+            let eliminated = [];
+            
+            Object.entries(voteCounts).forEach(([player, votes]) => {
+                if (votes > maxVotes) {
+                    maxVotes = votes;
+                    eliminated = [player];
+                } else if (votes === maxVotes) {
+                    eliminated.push(player);
+                }
+            });
+
+            // Check for tie
+            if (eliminated.length > 1) {
+                // Tie - start new round
+                room.currentRound++;
+                room.currentTurnIndex = 0;
+                room.messages = [];
+                room.votes = {};
+                room.phase = 'discussion';
+                room.tieResult = true;
+            } else {
+                // Someone eliminated
+                const eliminatedPlayer = eliminated[0];
+                room.eliminated.push(eliminatedPlayer);
+                room.eliminatedPlayer = eliminatedPlayer;
+                
+                const impostorPlayer = room.players.find(p => p.id === room.impostorId);
+                room.wasImpostor = eliminatedPlayer === impostorPlayer.name;
+                room.phase = 'results';
+            }
+
+            saveGameRooms(rooms);
+        }
+
+        function showResults() {
+            const rooms = getGameRooms();
+            const room = rooms[gameState.roomCode];
+
+            // Always show who the impostor was
+            document.getElementById('impostorReveal').style.display = 'block';
+            document.getElementById('actualImpostor').textContent = room.impostorName;
+            document.getElementById('revealWord').textContent = room.word;
+
+            if (room.tieResult) {
+                document.getElementById('resultDisplay').innerHTML = `
+                    <div class="result-title">TIE!</div>
+                    <p style="font-size: 1.2em; margin: 20px 0;">No one was eliminated</p>
+                    <p>Starting another discussion round...</p>
+                `;
+                document.getElementById('continueBtn').textContent = 'Start Next Round';
+                document.getElementById('impostorReveal').style.display = 'none';
+            } else {
+                const resultCard = document.getElementById('resultDisplay');
+                resultCard.className = 'result-card ' + (room.wasImpostor ? 'impostor-caught' : 'impostor-escaped');
+                
+                document.getElementById('eliminatedPlayer').textContent = room.eliminatedPlayer;
+                
+                if (room.wasImpostor) {
+                    document.getElementById('resultMessage').innerHTML = 
+                        '✅ <strong>They were the IMPOSTOR!</strong><br>Good job, team!';
+                    document.getElementById('continueBtn').textContent = 'Back to Lobby';
+                } else {
+                    document.getElementById('resultMessage').innerHTML = 
+                        '❌ <strong>They were NOT the impostor!</strong><br>The impostor escaped!';
+                    document.getElementById('continueBtn').textContent = 'Back to Lobby';
+                }
+            }
+
+            showScreen('resultsScreen');
+        }
+
+        function continueAfterResults() {
+            const rooms = getGameRooms();
+            const room = rooms[gameState.roomCode];
+
+            if (room.tieResult) {
+                room.tieResult = false;
+                room.phase = 'discussion';
+                saveGameRooms(rooms);
+                showDiscussionScreen();
+            } else {
+                // Game over
+                clearInterval(pollInterval);
+                leaveRoom();
+            }
+        }
+
+        // Leave room
+        function leaveRoom() {
+            clearInterval(pollInterval);
+            
+            const rooms = getGameRooms();
+            const room = rooms[gameState.roomCode];
+            
+            if (room) {
+                room.players = room.players.filter(p => p.name !== gameState.playerName);
+                
+                if (room.players.length === 0 || gameState.isHost) {
+                    delete rooms[gameState.roomCode];
+                } else {
+                    room.host = room.players[0].name;
+                }
+                
+                saveGameRooms(rooms);
+            }
+            
+            gameState = {
+                roomCode: null,
+                playerName: null,
+                isHost: false,
+                players: [],
+                currentWord: null,
+                isImpostor: false,
+                phase: 'lobby',
+                currentRound: 0,
+                maxRounds: 3,
+                currentTurnIndex: 0,
+                messages: [],
+                votes: {},
+                eliminated: []
+            };
+            
+            showHomeScreen();
+        }
+
+        // Clean up old rooms
+        window.addEventListener('load', () => {
+            const rooms = getGameRooms();
+            const now = Date.now();
+            const oneHour = 60 * 60 * 1000;
+            
+            Object.keys(rooms).forEach(code => {
+                if (rooms[code].startTime && now - rooms[code].startTime > oneHour) {
+                    delete rooms[code];
+                }
+            });
+            
+            saveGameRooms(rooms);
+        });
+    </script>
 </body>
 </html>
