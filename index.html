@@ -1,1062 +1,491 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Impostor Game - Fruits</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-        }
-
-        .container {
-            background: white;
-            border-radius: 20px;
-            padding: 40px;
-            max-width: 600px;
-            width: 100%;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-            max-height: 90vh;
-            overflow-y: auto;
-        }
-
-        h1 {
-            color: #667eea;
-            text-align: center;
-            margin-bottom: 30px;
-            font-size: 2.5em;
-        }
-
-        .screen {
-            display: none;
-        }
-
-        .screen.active {
-            display: block;
-            animation: fadeIn 0.3s;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .input-group {
-            margin-bottom: 20px;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 8px;
-            color: #555;
-            font-weight: 600;
-        }
-
-        input, textarea {
-            width: 100%;
-            padding: 15px;
-            border: 2px solid #e0e0e0;
-            border-radius: 10px;
-            font-size: 16px;
-            transition: border-color 0.3s;
-            font-family: inherit;
-        }
-
-        input:focus, textarea:focus {
-            outline: none;
-            border-color: #667eea;
-        }
-
-        button {
-            width: 100%;
-            padding: 15px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            border-radius: 10px;
-            font-size: 18px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: transform 0.2s, box-shadow 0.2s;
-        }
-
-        button:hover:not(:disabled) {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.4);
-        }
-
-        button:active {
-            transform: translateY(0);
-        }
-
-        button:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-
-        .btn-secondary {
-            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-            margin-top: 10px;
-        }
-
-        .room-code {
-            background: #f0f0f0;
-            padding: 20px;
-            border-radius: 10px;
-            text-align: center;
-            margin: 20px 0;
-        }
-
-        .room-code h2 {
-            color: #667eea;
-            font-size: 2em;
-            letter-spacing: 5px;
-        }
-
-        .players-list {
-            background: #f9f9f9;
-            border-radius: 10px;
-            padding: 20px;
-            margin: 20px 0;
-            max-height: 300px;
-            overflow-y: auto;
-        }
-
-        .player-item {
-            background: white;
-            padding: 12px;
-            margin: 8px 0;
-            border-radius: 8px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        }
-
-        .player-name {
-            font-weight: 600;
-            color: #333;
-        }
-
-        .host-badge {
-            background: #ffd700;
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 600;
-        }
-
-        .word-card {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 60px 40px;
-            border-radius: 20px;
-            text-align: center;
-            margin: 30px 0;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-        }
-
-        .word-card h2 {
-            font-size: 3em;
-            margin-bottom: 20px;
-            text-transform: uppercase;
-            letter-spacing: 3px;
-        }
-
-        .impostor-card {
-            background: linear-gradient(135deg, #f5576c 0%, #c92a3e 100%);
-        }
-
-        .info-text {
-            text-align: center;
-            color: #666;
-            margin: 20px 0;
-            font-size: 14px;
-        }
-
-        .game-stats {
-            display: flex;
-            justify-content: space-around;
-            margin: 20px 0;
-            padding: 20px;
-            background: #f9f9f9;
-            border-radius: 10px;
-        }
-
-        .stat {
-            text-align: center;
-        }
-
-        .stat-value {
-            font-size: 2em;
-            font-weight: 700;
-            color: #667eea;
-        }
-
-        .stat-label {
-            color: #888;
-            font-size: 14px;
-            margin-top: 5px;
-        }
-
-        .timer {
-            font-size: 1.5em;
-            font-weight: 700;
-            color: #667eea;
-            text-align: center;
-            margin: 20px 0;
-        }
-
-        .chat-container {
-            background: #f9f9f9;
-            border-radius: 10px;
-            padding: 20px;
-            margin: 20px 0;
-        }
-
-        .chat-messages {
-            max-height: 300px;
-            overflow-y: auto;
-            margin-bottom: 15px;
-            padding: 10px;
-            background: white;
-            border-radius: 8px;
-        }
-
-        .message {
-            padding: 10px;
-            margin: 8px 0;
-            border-radius: 8px;
-            background: #e8eaf6;
-        }
-
-        .message-author {
-            font-weight: 600;
-            color: #667eea;
-            margin-bottom: 5px;
-        }
-
-        .message-text {
-            color: #333;
-        }
-
-        .current-turn {
-            background: #fff3cd;
-            border: 2px solid #ffc107;
-            padding: 15px;
-            border-radius: 10px;
-            text-align: center;
-            margin: 15px 0;
-            font-weight: 600;
-            color: #856404;
-        }
-
-        .your-turn {
-            background: #d4edda;
-            border-color: #28a745;
-            color: #155724;
-        }
-
-        .vote-section {
-            background: #f9f9f9;
-            border-radius: 10px;
-            padding: 20px;
-            margin: 20px 0;
-        }
-
-        .vote-option {
-            background: white;
-            padding: 15px;
-            margin: 10px 0;
-            border-radius: 8px;
-            border: 2px solid #e0e0e0;
-            cursor: pointer;
-            transition: all 0.3s;
-            display: flex;
-            align-items: center;
-        }
-
-        .vote-option:hover {
-            border-color: #667eea;
-            transform: translateX(5px);
-        }
-
-        .vote-option.selected {
-            background: #667eea;
-            color: white;
-            border-color: #667eea;
-        }
-
-        .vote-radio {
-            margin-right: 15px;
-        }
-
-        .result-card {
-            background: white;
-            padding: 30px;
-            border-radius: 15px;
-            text-align: center;
-            margin: 20px 0;
-            border: 3px solid #e0e0e0;
-        }
-
-        .result-card.impostor-caught {
-            border-color: #28a745;
-            background: #d4edda;
-        }
-
-        .result-card.impostor-escaped {
-            border-color: #dc3545;
-            background: #f8d7da;
-        }
-
-        .result-title {
-            font-size: 2em;
-            font-weight: 700;
-            margin-bottom: 15px;
-        }
-
-        .result-player {
-            font-size: 1.5em;
-            color: #667eea;
-            margin: 10px 0;
-        }
-
-        .countdown {
-            font-size: 3em;
-            font-weight: 700;
-            color: #667eea;
-            text-align: center;
-            margin: 30px 0;
-        }
-
-        .round-indicator {
-            background: #667eea;
-            color: white;
-            padding: 10px 20px;
-            border-radius: 20px;
-            text-align: center;
-            margin: 15px 0;
-            font-weight: 600;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Impostor Game — Fruits</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    :root{
+      --p:#7F77DD;--p2:#3C3489;--red:#D85A30;
+      --bg:#ffffff;--bg2:#f5f5f3;--t:#1a1a18;--t2:#888780;--b:rgba(0,0,0,0.12);
+    }
+    @media(prefers-color-scheme:dark){
+      :root{--bg:#1a1a18;--bg2:#2c2c2a;--t:#f1efe8;--t2:#888780;--b:rgba(255,255,255,0.12);}
+    }
+    body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--t);min-height:100vh;display:flex;justify-content:center;align-items:flex-start;padding:20px}
+    #app{width:100%;max-width:480px;padding:1.5rem 1rem}
+    h1{font-family:'Syne',sans-serif;font-weight:800;font-size:1.8rem;color:var(--t)}
+    h2{font-family:'Syne',sans-serif;font-weight:700;font-size:1.2rem;color:var(--t)}
+    input,textarea,select{width:100%;padding:10px 14px;border:1px solid var(--b);border-radius:8px;background:var(--bg);color:var(--t);font-family:'DM Sans',sans-serif;font-size:15px;margin-top:6px;outline:none}
+    input:focus,textarea:focus,select:focus{border-color:var(--p)}
+    label{font-size:13px;color:var(--t2);display:block;margin-top:14px}
+    .btn{display:block;width:100%;padding:12px;border-radius:10px;border:none;font-family:'Syne',sans-serif;font-weight:700;font-size:15px;cursor:pointer;margin-top:12px;transition:opacity .15s,transform .1s;background:var(--p);color:#fff}
+    .btn:hover{opacity:.9;transform:translateY(-1px)}
+    .btn:active{transform:scale(.98)}
+    .btn.sec{background:var(--bg2);color:var(--t);border:1px solid var(--b)}
+    .btn.danger{background:var(--red);color:#fff}
+    .btn:disabled{opacity:.4;cursor:not-allowed}
+    .screen{display:none;animation:fi .25s ease}
+    .screen.on{display:block}
+    @keyframes fi{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+    .code-box{background:var(--bg2);border:1px solid var(--b);border-radius:12px;padding:1.2rem;text-align:center;margin:1rem 0}
+    .code-box .code{font-family:'Syne',sans-serif;font-size:2.4rem;font-weight:800;letter-spacing:6px;color:var(--p)}
+    .pill{display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:500;background:#AFA9EC;color:#26215C}
+    .player-row{display:flex;justify-content:space-between;align-items:center;padding:10px 14px;border-radius:8px;background:var(--bg2);border:1px solid var(--b);margin-top:8px}
+    .word-reveal{border-radius:16px;padding:2.5rem 1.5rem;text-align:center;margin:1rem 0;background:var(--p)}
+    .word-reveal.imp{background:var(--red)}
+    .word-reveal .wlabel{font-size:12px;color:rgba(255,255,255,.7);letter-spacing:2px;text-transform:uppercase;margin-bottom:8px}
+    .word-reveal .word{font-family:'Syne',sans-serif;font-size:2.8rem;font-weight:800;color:#fff;letter-spacing:2px}
+    .count-big{font-family:'Syne',sans-serif;font-size:5rem;font-weight:800;color:var(--p);text-align:center;margin:1.5rem 0}
+    .round-badge{display:inline-block;background:#EEEDFE;color:#3C3489;padding:5px 16px;border-radius:20px;font-size:13px;font-weight:500;margin-bottom:12px}
+    .turn-bar{padding:12px;border-radius:10px;text-align:center;font-weight:500;font-size:14px;margin:10px 0;background:var(--bg2);border:1px solid var(--b)}
+    .turn-bar.mine{background:#EAF3DE;color:#3B6D11;border-color:#97C459}
+    .msgs{max-height:260px;overflow-y:auto;margin:10px 0;display:flex;flex-direction:column;gap:8px}
+    .msg{background:var(--bg2);padding:10px 14px;border-radius:10px;border:1px solid var(--b)}
+    .msg .ma{font-size:12px;color:var(--p);font-weight:500;margin-bottom:3px}
+    .msg .mt{font-size:14px;color:var(--t)}
+    .vote-opt{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:10px;border:1px solid var(--b);background:var(--bg2);margin-top:8px;cursor:pointer;transition:border-color .15s,background .15s}
+    .vote-opt:hover{border-color:var(--p)}
+    .vote-opt.sel{background:#EEEDFE;border-color:var(--p);color:#3C3489}
+    .res-card{border-radius:14px;padding:1.5rem;text-align:center;margin:1rem 0;border:2px solid var(--b)}
+    .res-card.win{background:#EAF3DE;border-color:#97C459}
+    .res-card.lose{background:#FAECE7;border-color:#F0997B}
+    .res-card.imp-reveal{background:var(--p);color:#fff}
+    .res-big{font-family:'Syne',sans-serif;font-size:1.5rem;font-weight:800;margin-bottom:8px}
+    .status{font-size:13px;color:var(--t2);text-align:center;margin:8px 0}
+    .err{color:var(--red);font-size:13px;margin-top:6px;min-height:18px}
+    .stats{display:flex;gap:12px;margin:10px 0}
+    .stat{flex:1;background:var(--bg2);border-radius:10px;padding:12px;text-align:center;border:1px solid var(--b)}
+    .stat .sv{font-family:'Syne',sans-serif;font-size:1.8rem;font-weight:800;color:var(--p)}
+    .stat .sl{font-size:12px;color:var(--t2);margin-top:2px}
+    textarea{resize:none;height:70px}
+    .spinner{width:18px;height:18px;border:2px solid var(--b);border-top-color:var(--p);border-radius:50%;animation:spin 0.7s linear infinite;display:inline-block;vertical-align:middle;margin-right:6px}
+    @keyframes spin{to{transform:rotate(360deg)}}
+  </style>
 </head>
 <body>
-    <div class="container">
-        <!-- Home Screen -->
-        <div id="homeScreen" class="screen active">
-            <h1>🍎 Impostor Game</h1>
-            <p class="info-text">Fruits Edition - Find the Impostor!</p>
-            
-            <div class="input-group">
-                <label>Your Name</label>
-                <input type="text" id="playerName" placeholder="Enter your name" maxlength="20">
-            </div>
+<div id="app">
 
-            <button onclick="createRoom()">Create Room</button>
-            <button onclick="showJoinScreen()" class="btn-secondary">Join Room</button>
-        </div>
+  <!-- Home -->
+  <div id="sHome" class="screen on">
+    <h1 style="margin-bottom:4px">Impostor 🍎</h1>
+    <p style="font-size:13px;color:var(--t2);margin-bottom:1.5rem">Fruits Edition — cross-device multiplayer</p>
+    <label>Your name</label>
+    <input id="hName" placeholder="Enter your name" maxlength="20">
+    <div id="hErr" class="err"></div>
+    <button class="btn" onclick="createRoom()">Create room</button>
+    <button class="btn sec" onclick="go('sJoin')">Join a room</button>
+  </div>
 
-        <!-- Join Room Screen -->
-        <div id="joinScreen" class="screen">
-            <h1>Join Room</h1>
-            
-            <div class="input-group">
-                <label>Your Name</label>
-                <input type="text" id="joinPlayerName" placeholder="Enter your name" maxlength="20">
-            </div>
+  <!-- Join -->
+  <div id="sJoin" class="screen">
+    <h1 style="margin-bottom:1rem">Join room</h1>
+    <label>Your name</label>
+    <input id="jName" placeholder="Enter your name" maxlength="20">
+    <label>Room code</label>
+    <input id="jCode" placeholder="6-digit code" maxlength="6" style="text-transform:uppercase;letter-spacing:3px">
+    <div id="jErr" class="err"></div>
+    <button class="btn" onclick="joinRoom()">Join room</button>
+    <button class="btn sec" onclick="go('sHome')">Back</button>
+  </div>
 
-            <div class="input-group">
-                <label>Room Code</label>
-                <input type="text" id="roomCode" placeholder="Enter 6-digit code" maxlength="6">
-            </div>
-
-            <button onclick="joinRoom()">Join Room</button>
-            <button onclick="showHomeScreen()" class="btn-secondary">Back</button>
-        </div>
-
-        <!-- Lobby Screen -->
-        <div id="lobbyScreen" class="screen">
-            <h1>Lobby</h1>
-            
-            <div class="room-code">
-                <p style="color: #888; margin-bottom: 10px;">Room Code</p>
-                <h2 id="displayRoomCode">------</h2>
-            </div>
-
-            <div class="game-stats">
-                <div class="stat">
-                    <div class="stat-value" id="playerCount">0</div>
-                    <div class="stat-label">Players</div>
-                </div>
-                <div class="stat">
-                    <div class="stat-value">1</div>
-                    <div class="stat-label">Impostor</div>
-                </div>
-            </div>
-
-            <div class="players-list" id="playersList"></div>
-
-            <div id="hostControls" style="display: none;">
-                <div class="input-group">
-                    <label>Number of Discussion Rounds</label>
-                    <select id="roundsSelect" style="padding: 12px; border-radius: 8px; border: 2px solid #e0e0e0; font-size: 16px;">
-                        <option value="1">1 Round</option>
-                        <option value="2">2 Rounds</option>
-                        <option value="3" selected>3 Rounds</option>
-                        <option value="4">4 Rounds</option>
-                        <option value="5">5 Rounds</option>
-                    </select>
-                </div>
-                <button onclick="startGame()">Start Game</button>
-            </div>
-            
-            <button onclick="leaveRoom()" class="btn-secondary">Leave Room</button>
-        </div>
-
-        <!-- Countdown Screen -->
-        <div id="countdownScreen" class="screen">
-            <h1>Game Starting...</h1>
-            <div class="countdown" id="countdownTimer">10</div>
-            <p class="info-text">Memorize your word!</p>
-            <div id="countdownWordDisplay" class="word-card">
-                <h2>?????</h2>
-            </div>
-        </div>
-
-        <!-- Discussion Screen -->
-        <div id="discussionScreen" class="screen">
-            <h1>Discussion</h1>
-            
-            <div class="round-indicator" id="roundIndicator">Round 1 of 3</div>
-
-            <div class="current-turn" id="turnIndicator">
-                Waiting for turn...
-            </div>
-
-            <div class="chat-container">
-                <div class="chat-messages" id="chatMessages"></div>
-                
-                <div id="messageInputArea" style="display: none;">
-                    <textarea id="messageInput" rows="3" placeholder="Type your message..." maxlength="200"></textarea>
-                    <button onclick="sendMessage()" style="margin-top: 10px;">Send Message</button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Voting Screen -->
-        <div id="votingScreen" class="screen">
-            <h1>Vote Out the Impostor</h1>
-            
-            <p class="info-text">Choose who you think is the impostor</p>
-
-            <div class="vote-section" id="voteOptions"></div>
-
-            <button onclick="submitVote()" id="submitVoteBtn">Submit Vote</button>
-        </div>
-
-        <!-- Results Screen -->
-        <div id="resultsScreen" class="screen">
-            <h1>Results</h1>
-            
-            <div id="resultDisplay" class="result-card">
-                <div class="result-title">Eliminated</div>
-                <div class="result-player" id="eliminatedPlayer">-</div>
-                <p id="resultMessage"></p>
-            </div>
-
-            <div id="impostorReveal" class="result-card impostor-card" style="display: none;">
-                <div class="result-title">The Impostor Was...</div>
-                <div class="result-player" id="actualImpostor" style="color: white;">-</div>
-                <p style="color: white; margin-top: 15px;">The word was: <strong id="revealWord">-</strong></p>
-            </div>
-
-            <button onclick="continueAfterResults()" id="continueBtn">Continue</button>
-        </div>
+  <!-- Lobby -->
+  <div id="sLobby" class="screen">
+    <h1 style="margin-bottom:.5rem">Lobby</h1>
+    <div class="code-box">
+      <div style="font-size:12px;color:var(--t2);margin-bottom:4px">Share this code</div>
+      <div class="code" id="lCode">——</div>
     </div>
-
-    <script>
-        // Game state
-        let gameState = {
-            roomCode: null,
-            playerName: null,
-            isHost: false,
-            players: [],
-            currentWord: null,
-            isImpostor: false,
-            phase: 'lobby', // lobby, countdown, discussion, voting, results
-            currentRound: 0,
-            maxRounds: 3,
-            currentTurnIndex: 0,
-            messages: [],
-            votes: {},
-            eliminated: []
-        };
-
-        // Fruit words
-        const fruits = [
-            'APPLE', 'BANANA', 'ORANGE', 'GRAPE', 'MANGO',
-            'STRAWBERRY', 'WATERMELON', 'PINEAPPLE', 'CHERRY', 'PEACH',
-            'KIWI', 'PAPAYA', 'LEMON', 'LIME', 'PLUM'
-        ];
-
-        // Local storage helpers
-        function getGameRooms() {
-            return JSON.parse(localStorage.getItem('impostorRooms') || '{}');
-        }
-
-        function saveGameRooms(rooms) {
-            localStorage.setItem('impostorRooms', JSON.stringify(rooms));
-        }
-
-        function generateRoomCode() {
-            return Math.floor(100000 + Math.random() * 900000).toString();
-        }
-
-        // Screen navigation
-        function showScreen(screenId) {
-            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-            document.getElementById(screenId).classList.add('active');
-        }
-
-        function showHomeScreen() {
-            showScreen('homeScreen');
-        }
-
-        function showJoinScreen() {
-            showScreen('joinScreen');
-        }
-
-        // Create room
-        function createRoom() {
-            const name = document.getElementById('playerName').value.trim();
-            if (!name) {
-                alert('Please enter your name!');
-                return;
-            }
-
-            const roomCode = generateRoomCode();
-            const rooms = getGameRooms();
-
-            rooms[roomCode] = {
-                host: name,
-                players: [{ name: name, id: Date.now() }],
-                started: false,
-                phase: 'lobby'
-            };
-
-            saveGameRooms(rooms);
-
-            gameState.roomCode = roomCode;
-            gameState.playerName = name;
-            gameState.isHost = true;
-            gameState.players = rooms[roomCode].players;
-
-            document.getElementById('displayRoomCode').textContent = roomCode;
-            document.getElementById('hostControls').style.display = 'block';
-            
-            updatePlayersList();
-            showScreen('lobbyScreen');
-            startLobbyPolling();
-        }
-
-        // Join room
-        function joinRoom() {
-            const name = document.getElementById('joinPlayerName').value.trim();
-            const code = document.getElementById('roomCode').value.trim();
-
-            if (!name) {
-                alert('Please enter your name!');
-                return;
-            }
-
-            if (!code || code.length !== 6) {
-                alert('Please enter a valid 6-digit room code!');
-                return;
-            }
-
-            const rooms = getGameRooms();
-            
-            if (!rooms[code]) {
-                alert('Room not found!');
-                return;
-            }
-
-            if (rooms[code].started) {
-                alert('Game already started!');
-                return;
-            }
-
-            rooms[code].players.push({ name: name, id: Date.now() });
-            saveGameRooms(rooms);
-
-            gameState.roomCode = code;
-            gameState.playerName = name;
-            gameState.isHost = false;
-            gameState.players = rooms[code].players;
-
-            document.getElementById('displayRoomCode').textContent = code;
-            document.getElementById('hostControls').style.display = 'none';
-            
-            updatePlayersList();
-            showScreen('lobbyScreen');
-            startLobbyPolling();
-        }
-
-        // Update players list
-        function updatePlayersList() {
-            const rooms = getGameRooms();
-            const room = rooms[gameState.roomCode];
-            
-            if (!room) return;
-
-            gameState.players = room.players;
-            
-            const listHtml = room.players.map(player => `
-                <div class="player-item">
-                    <span class="player-name">${player.name}</span>
-                    ${player.name === room.host ? '<span class="host-badge">HOST</span>' : ''}
-                </div>
-            `).join('');
-
-            document.getElementById('playersList').innerHTML = listHtml;
-            document.getElementById('playerCount').textContent = room.players.length;
-        }
-
-        // Polling
-        let pollInterval;
-        function startLobbyPolling() {
-            pollInterval = setInterval(() => {
-                const rooms = getGameRooms();
-                const room = rooms[gameState.roomCode];
-                
-                if (!room) {
-                    clearInterval(pollInterval);
-                    alert('Room closed!');
-                    showHomeScreen();
-                    return;
-                }
-
-                updatePlayersList();
-
-                if (room.started && gameState.phase === 'lobby') {
-                    clearInterval(pollInterval);
-                    loadGameState();
-                    startCountdown();
-                }
-            }, 1000);
-        }
-
-        function startGamePolling() {
-            pollInterval = setInterval(() => {
-                const rooms = getGameRooms();
-                const room = rooms[gameState.roomCode];
-                
-                if (!room) return;
-
-                // Update based on phase
-                if (room.phase === 'discussion' && gameState.phase === 'discussion') {
-                    updateDiscussion();
-                } else if (room.phase === 'voting' && gameState.phase !== 'voting') {
-                    gameState.phase = 'voting';
-                    showVotingScreen();
-                } else if (room.phase === 'results' && gameState.phase !== 'results') {
-                    gameState.phase = 'results';
-                    showResults();
-                }
-            }, 500);
-        }
-
-        // Start game
-        function startGame() {
-            const rooms = getGameRooms();
-            const room = rooms[gameState.roomCode];
-
-            if (room.players.length < 3) {
-                alert('Need at least 3 players!');
-                return;
-            }
-
-            const maxRounds = parseInt(document.getElementById('roundsSelect').value);
-            const word = fruits[Math.floor(Math.random() * fruits.length)];
-            const impostorIndex = Math.floor(Math.random() * room.players.length);
-
-            room.started = true;
-            room.word = word;
-            room.impostorId = room.players[impostorIndex].id;
-            room.impostorName = room.players[impostorIndex].name;
-            room.phase = 'countdown';
-            room.currentRound = 1;
-            room.maxRounds = maxRounds;
-            room.currentTurnIndex = 0;
-            room.roundStartPlayer = 0;
-            room.messages = [];
-            room.votes = {};
-            room.eliminated = [];
-
-            saveGameRooms(rooms);
-            clearInterval(pollInterval);
-            
-            gameState.maxRounds = maxRounds;
-            loadGameState();
-            startCountdown();
-        }
-
-        // Load game state
-        function loadGameState() {
-            const rooms = getGameRooms();
-            const room = rooms[gameState.roomCode];
-            
-            if (!room) return;
-
-            const myPlayer = room.players.find(p => p.name === gameState.playerName);
-            gameState.isImpostor = myPlayer && myPlayer.id === room.impostorId;
-            gameState.currentWord = room.word;
-            gameState.currentRound = room.currentRound || 1;
-            gameState.maxRounds = room.maxRounds || 3;
-            gameState.phase = room.phase;
-        }
-
-        // Countdown
-        function startCountdown() {
-            loadGameState();
-            
-            const wordCard = document.getElementById('countdownWordDisplay');
-            
-            if (gameState.isImpostor) {
-                wordCard.innerHTML = '<h2>IMPOSTOR</h2><p style="margin-top: 15px;">You don\'t know the word!</p>';
-                wordCard.classList.add('impostor-card');
-            } else {
-                wordCard.innerHTML = `<h2>${gameState.currentWord}</h2>`;
-                wordCard.classList.remove('impostor-card');
-            }
-
-            showScreen('countdownScreen');
-
-            let countdown = 10;
-            document.getElementById('countdownTimer').textContent = countdown;
-
-            const countInterval = setInterval(() => {
-                countdown--;
-                document.getElementById('countdownTimer').textContent = countdown;
-
-                if (countdown <= 0) {
-                    clearInterval(countInterval);
-                    
-                    if (gameState.isHost) {
-                        const rooms = getGameRooms();
-                        rooms[gameState.roomCode].phase = 'discussion';
-                        saveGameRooms(rooms);
-                    }
-                    
-                    gameState.phase = 'discussion';
-                    showDiscussionScreen();
-                    startGamePolling();
-                }
-            }, 1000);
-        }
-
-        // Discussion
-        function showDiscussionScreen() {
-            document.getElementById('roundIndicator').textContent = `Round ${gameState.currentRound} of ${gameState.maxRounds}`;
-            showScreen('discussionScreen');
-            updateDiscussion();
-        }
-
-        function updateDiscussion() {
-            const rooms = getGameRooms();
-            const room = rooms[gameState.roomCode];
-            
-            if (!room) return;
-
-            // Update messages
-            const messagesHtml = room.messages.map(msg => `
-                <div class="message">
-                    <div class="message-author">${msg.author}</div>
-                    <div class="message-text">${msg.text}</div>
-                </div>
-            `).join('');
-            document.getElementById('chatMessages').innerHTML = messagesHtml;
-            
-            // Scroll to bottom
-            const chatDiv = document.getElementById('chatMessages');
-            chatDiv.scrollTop = chatDiv.scrollHeight;
-
-            // Update turn - calculate based on round start player
-            const activePlayers = room.players.filter(p => !room.eliminated.includes(p.name));
-            const turnOffset = room.currentTurnIndex % activePlayers.length;
-            const currentPlayerIndex = (room.roundStartPlayer + turnOffset) % activePlayers.length;
-            const currentPlayer = activePlayers[currentPlayerIndex];
-            
-            const turnDiv = document.getElementById('turnIndicator');
-            const inputArea = document.getElementById('messageInputArea');
-            
-            if (currentPlayer.name === gameState.playerName) {
-                turnDiv.textContent = "Your turn to speak!";
-                turnDiv.classList.add('your-turn');
-                inputArea.style.display = 'block';
-            } else {
-                turnDiv.textContent = `${currentPlayer.name}'s turn to speak`;
-                turnDiv.classList.remove('your-turn');
-                inputArea.style.display = 'none';
-            }
-        }
-
-        function sendMessage() {
-            const input = document.getElementById('messageInput');
-            const text = input.value.trim();
-            
-            if (!text) return;
-
-            const rooms = getGameRooms();
-            const room = rooms[gameState.roomCode];
-
-            room.messages.push({
-                author: gameState.playerName,
-                text: text
-            });
-
-            // Move to next turn
-            room.currentTurnIndex++;
-            
-            // Check if round is complete (back to starting player)
-            const activePlayers = room.players.filter(p => !room.eliminated.includes(p.name));
-            const turnsInRound = activePlayers.length;
-            
-            if (room.currentTurnIndex % turnsInRound === 0 && room.currentTurnIndex > 0) {
-                // Round complete
-                if (room.currentRound >= room.maxRounds) {
-                    // All rounds done - move to voting
-                    room.phase = 'voting';
-                    room.votes = {};
-                } else {
-                    // Start next round
-                    room.currentRound++;
-                    room.roundStartPlayer = 0; // Start from first player again
-                }
-            }
-
-            saveGameRooms(rooms);
-            input.value = '';
-            updateDiscussion();
-        }
-
-        // Voting
-        function showVotingScreen() {
-            const rooms = getGameRooms();
-            const room = rooms[gameState.roomCode];
-            
-            const activePlayers = room.players.filter(p => !room.eliminated.includes(p.name));
-            
-            const optionsHtml = activePlayers.map(player => `
-                <div class="vote-option" onclick="selectVote('${player.name}')">
-                    <input type="radio" name="vote" value="${player.name}" class="vote-radio">
-                    <span>${player.name}</span>
-                </div>
-            `).join('');
-
-            document.getElementById('voteOptions').innerHTML = optionsHtml;
-            showScreen('votingScreen');
-        }
-
-        let selectedVote = null;
-        function selectVote(playerName) {
-            selectedVote = playerName;
-            document.querySelectorAll('.vote-option').forEach(opt => {
-                opt.classList.remove('selected');
-            });
-            event.currentTarget.classList.add('selected');
-        }
-
-        function submitVote() {
-            if (!selectedVote) {
-                alert('Please select a player!');
-                return;
-            }
-
-            const rooms = getGameRooms();
-            const room = rooms[gameState.roomCode];
-
-            if (!room.votes) room.votes = {};
-            room.votes[gameState.playerName] = selectedVote;
-
-            saveGameRooms(rooms);
-
-            // Check if everyone voted
-            const activePlayers = room.players.filter(p => !room.eliminated.includes(p.name));
-            if (Object.keys(room.votes).length >= activePlayers.length) {
-                if (gameState.isHost) {
-                    calculateResults();
-                }
-            }
-
-            document.getElementById('submitVoteBtn').disabled = true;
-            document.getElementById('submitVoteBtn').textContent = 'Waiting for others...';
-        }
-
-        function calculateResults() {
-            const rooms = getGameRooms();
-            const room = rooms[gameState.roomCode];
-
-            // Count votes
-            const voteCounts = {};
-            Object.values(room.votes).forEach(vote => {
-                voteCounts[vote] = (voteCounts[vote] || 0) + 1;
-            });
-
-            // Find player with most votes
-            let maxVotes = 0;
-            let eliminated = [];
-            
-            Object.entries(voteCounts).forEach(([player, votes]) => {
-                if (votes > maxVotes) {
-                    maxVotes = votes;
-                    eliminated = [player];
-                } else if (votes === maxVotes) {
-                    eliminated.push(player);
-                }
-            });
-
-            // Check for tie
-            if (eliminated.length > 1) {
-                // Tie - start new round
-                room.currentRound++;
-                room.currentTurnIndex = 0;
-                room.messages = [];
-                room.votes = {};
-                room.phase = 'discussion';
-                room.tieResult = true;
-            } else {
-                // Someone eliminated
-                const eliminatedPlayer = eliminated[0];
-                room.eliminated.push(eliminatedPlayer);
-                room.eliminatedPlayer = eliminatedPlayer;
-                
-                const impostorPlayer = room.players.find(p => p.id === room.impostorId);
-                room.wasImpostor = eliminatedPlayer === impostorPlayer.name;
-                room.phase = 'results';
-            }
-
-            saveGameRooms(rooms);
-        }
-
-        function showResults() {
-            const rooms = getGameRooms();
-            const room = rooms[gameState.roomCode];
-
-            // Always show who the impostor was
-            document.getElementById('impostorReveal').style.display = 'block';
-            document.getElementById('actualImpostor').textContent = room.impostorName;
-            document.getElementById('revealWord').textContent = room.word;
-
-            if (room.tieResult) {
-                document.getElementById('resultDisplay').innerHTML = `
-                    <div class="result-title">TIE!</div>
-                    <p style="font-size: 1.2em; margin: 20px 0;">No one was eliminated</p>
-                    <p>Starting another discussion round...</p>
-                `;
-                document.getElementById('continueBtn').textContent = 'Start Next Round';
-                document.getElementById('impostorReveal').style.display = 'none';
-            } else {
-                const resultCard = document.getElementById('resultDisplay');
-                resultCard.className = 'result-card ' + (room.wasImpostor ? 'impostor-caught' : 'impostor-escaped');
-                
-                document.getElementById('eliminatedPlayer').textContent = room.eliminatedPlayer;
-                
-                if (room.wasImpostor) {
-                    document.getElementById('resultMessage').innerHTML = 
-                        '✅ <strong>They were the IMPOSTOR!</strong><br>Good job, team!';
-                    document.getElementById('continueBtn').textContent = 'Back to Lobby';
-                } else {
-                    document.getElementById('resultMessage').innerHTML = 
-                        '❌ <strong>They were NOT the impostor!</strong><br>The impostor escaped!';
-                    document.getElementById('continueBtn').textContent = 'Back to Lobby';
-                }
-            }
-
-            showScreen('resultsScreen');
-        }
-
-        function continueAfterResults() {
-            const rooms = getGameRooms();
-            const room = rooms[gameState.roomCode];
-
-            if (room.tieResult) {
-                room.tieResult = false;
-                room.phase = 'discussion';
-                saveGameRooms(rooms);
-                showDiscussionScreen();
-            } else {
-                // Game over
-                clearInterval(pollInterval);
-                leaveRoom();
-            }
-        }
-
-        // Leave room
-        function leaveRoom() {
-            clearInterval(pollInterval);
-            
-            const rooms = getGameRooms();
-            const room = rooms[gameState.roomCode];
-            
-            if (room) {
-                room.players = room.players.filter(p => p.name !== gameState.playerName);
-                
-                if (room.players.length === 0 || gameState.isHost) {
-                    delete rooms[gameState.roomCode];
-                } else {
-                    room.host = room.players[0].name;
-                }
-                
-                saveGameRooms(rooms);
-            }
-            
-            gameState = {
-                roomCode: null,
-                playerName: null,
-                isHost: false,
-                players: [],
-                currentWord: null,
-                isImpostor: false,
-                phase: 'lobby',
-                currentRound: 0,
-                maxRounds: 3,
-                currentTurnIndex: 0,
-                messages: [],
-                votes: {},
-                eliminated: []
-            };
-            
-            showHomeScreen();
-        }
-
-        // Clean up old rooms
-        window.addEventListener('load', () => {
-            const rooms = getGameRooms();
-            const now = Date.now();
-            const oneHour = 60 * 60 * 1000;
-            
-            Object.keys(rooms).forEach(code => {
-                if (rooms[code].startTime && now - rooms[code].startTime > oneHour) {
-                    delete rooms[code];
-                }
-            });
-            
-            saveGameRooms(rooms);
-        });
-    </script>
+    <div class="stats">
+      <div class="stat"><div class="sv" id="lCount">0</div><div class="sl">Players</div></div>
+      <div class="stat"><div class="sv">1</div><div class="sl">Impostor</div></div>
+    </div>
+    <div id="lPlayers" style="margin:8px 0"></div>
+    <div id="lHostCtrl" style="display:none">
+      <label>Discussion rounds</label>
+      <select id="lRounds">
+        <option value="1">1 round</option>
+        <option value="2">2 rounds</option>
+        <option value="3" selected>3 rounds</option>
+        <option value="4">4 rounds</option>
+        <option value="5">5 rounds</option>
+      </select>
+      <button class="btn" onclick="startGame()">Start game</button>
+    </div>
+    <div id="lWait" class="status" style="display:none"><span class="spinner"></span>Waiting for host to start...</div>
+    <button class="btn sec danger" onclick="leaveRoom()" style="margin-top:8px">Leave room</button>
+  </div>
+
+  <!-- Countdown -->
+  <div id="sCountdown" class="screen">
+    <h1 style="text-align:center;margin-bottom:.5rem">Memorise your word</h1>
+    <div id="cdWord" class="word-reveal"><div class="wlabel">Your word</div><div class="word">?</div></div>
+    <div class="count-big" id="cdNum">10</div>
+    <p class="status">Game begins when countdown ends</p>
+  </div>
+
+  <!-- Discussion -->
+  <div id="sDiscuss" class="screen">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+      <h2>Discussion</h2>
+      <span class="round-badge" id="dRound">Round 1/3</span>
+    </div>
+    <div class="turn-bar" id="dTurn">Waiting...</div>
+    <div class="msgs" id="dMsgs"></div>
+    <div id="dInput" style="display:none">
+      <textarea id="dText" placeholder="Type your message..." maxlength="200"></textarea>
+      <button class="btn" onclick="sendMsg()" style="margin-top:8px">Send</button>
+    </div>
+    <p class="status" id="dWait" style="display:none"><span class="spinner"></span>Waiting for their turn...</p>
+  </div>
+
+  <!-- Vote -->
+  <div id="sVote" class="screen">
+    <h1 style="margin-bottom:.3rem">Vote</h1>
+    <p class="status" style="margin-bottom:1rem">Who do you think is the impostor?</p>
+    <div id="vOptions"></div>
+    <div id="vErr" class="err"></div>
+    <button class="btn" onclick="submitVote()" id="vBtn">Submit vote</button>
+    <p class="status" id="vWait" style="display:none"><span class="spinner"></span>Waiting for all votes...</p>
+  </div>
+
+  <!-- Results -->
+  <div id="sResults" class="screen">
+    <h1 style="margin-bottom:1rem">Results</h1>
+    <div id="rMain" class="res-card"></div>
+    <div id="rReveal" class="res-card imp-reveal" style="display:none">
+      <div class="res-big" style="color:#fff">The impostor was...</div>
+      <div style="font-size:1.6rem;color:#fff;margin:8px 0" id="rImpName">-</div>
+      <div style="color:rgba(255,255,255,.8);font-size:13px">The word was: <strong id="rWord">-</strong></div>
+    </div>
+    <button class="btn" onclick="contResults()" id="rBtn">Continue</button>
+  </div>
+
+</div>
+
+<script>
+// ─── Config ───────────────────────────────────────────────
+const BACKEND_URL = 'https://api.anthropic.com/v1/messages';
+// This game uses the Anthropic storage API via window.storage when run inside Claude.
+// When hosted standalone, replace the storage calls below with your own backend (e.g. Firebase, Supabase).
+
+const FRUITS=['APPLE','BANANA','ORANGE','GRAPE','MANGO','STRAWBERRY','WATERMELON','PINEAPPLE','CHERRY','PEACH','KIWI','PAPAYA','LEMON','LIME','PLUM'];
+const POLL=1500;
+let G={room:null,name:null,isHost:false,isImp:false,phase:'home',voted:false,selVote:null};
+let poller=null;
+
+// ─── Storage helpers ──────────────────────────────────────
+// Uses window.storage (Claude artifact storage) if available,
+// otherwise falls back to a simple in-memory store for local testing.
+const mem={};
+const store={
+  async get(k){
+    if(window.storage){try{const r=await window.storage.get(k,true);return r?JSON.parse(r.value):null;}catch{return null;}}
+    return mem[k]?JSON.parse(mem[k]):null;
+  },
+  async set(k,v){
+    const s=JSON.stringify(v);
+    if(window.storage){try{await window.storage.set(k,s,true);}catch{}}
+    mem[k]=s;
+  },
+  async del(k){
+    if(window.storage){try{await window.storage.delete(k,true);}catch{}}
+    delete mem[k];
+  }
+};
+
+async function getRoom(){return store.get('room:'+G.room);}
+async function saveRoom(room){await store.set('room:'+G.room,room);}
+
+// ─── Navigation ───────────────────────────────────────────
+function go(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('on'));
+  document.getElementById(id).classList.add('on');
+}
+
+function genCode(){return Math.floor(100000+Math.random()*900000).toString();}
+
+// ─── Create room ─────────────────────────────────────────
+async function createRoom(){
+  const name=document.getElementById('hName').value.trim();
+  const err=document.getElementById('hErr');
+  if(!name){err.textContent='Enter your name';return;}
+  err.textContent='';
+  const code=genCode();
+  const room={
+    code,host:name,
+    players:[{name,id:Date.now()}],
+    phase:'lobby',started:false,
+    word:'',impostorName:'',
+    messages:[],votes:{},eliminated:[],
+    currentRound:1,maxRounds:3,currentTurnIndex:0,
+    tieResult:false,eliminatedPlayer:'',wasImpostor:false
+  };
+  G={room:code,name,isHost:true,isImp:false,phase:'lobby',voted:false,selVote:null};
+  await store.set('room:'+code,room);
+  loadLobby(room);
+  go('sLobby');
+  startPoll();
+}
+
+// ─── Join room ────────────────────────────────────────────
+async function joinRoom(){
+  const name=document.getElementById('jName').value.trim();
+  const code=document.getElementById('jCode').value.trim().replace(/\s/g,'');
+  const err=document.getElementById('jErr');
+  err.textContent='';
+  if(!name){err.textContent='Enter your name';return;}
+  if(code.length!==6){err.textContent='Enter a valid 6-digit code';return;}
+  const room=await store.get('room:'+code);
+  if(!room){err.textContent='Room not found — check the code';return;}
+  if(room.started){err.textContent='Game already started';return;}
+  if(room.players.find(p=>p.name===name)){err.textContent='That name is already taken in this room';return;}
+  room.players.push({name,id:Date.now()});
+  await store.set('room:'+code,room);
+  G={room:code,name,isHost:false,isImp:false,phase:'lobby',voted:false,selVote:null};
+  loadLobby(room);
+  go('sLobby');
+  startPoll();
+}
+
+// ─── Lobby ────────────────────────────────────────────────
+function loadLobby(room){
+  document.getElementById('lCode').textContent=room.code;
+  document.getElementById('lCount').textContent=room.players.length;
+  document.getElementById('lPlayers').innerHTML=room.players
+    .map(p=>`<div class="player-row"><span>${p.name}</span>${p.name===room.host?'<span class="pill">Host</span>':''}</div>`)
+    .join('');
+  if(G.isHost){
+    document.getElementById('lHostCtrl').style.display='block';
+    document.getElementById('lWait').style.display='none';
+  } else {
+    document.getElementById('lHostCtrl').style.display='none';
+    document.getElementById('lWait').style.display='block';
+  }
+}
+
+// ─── Polling ──────────────────────────────────────────────
+function startPoll(){
+  if(poller)clearInterval(poller);
+  poller=setInterval(poll,POLL);
+}
+
+async function poll(){
+  const room=await getRoom();
+  if(!room){clearInterval(poller);alert('Room was closed.');resetHome();return;}
+  if(G.phase==='lobby'){
+    loadLobby(room);
+    if(room.started&&room.phase==='countdown'){clearInterval(poller);G.phase='countdown';beginCountdown(room);}
+  } else if(G.phase==='discussion'){
+    updateDiscussion(room);
+    if(room.phase==='voting'){G.phase='voting';go('sVote');renderVote(room);}
+  } else if(G.phase==='voting'){
+    if(room.phase==='results'){G.phase='results';showResults(room);}
+    else if(G.voted){checkAllVoted(room);}
+  }
+}
+
+// ─── Start game (host only) ───────────────────────────────
+async function startGame(){
+  const room=await getRoom();if(!room)return;
+  if(room.players.length<3){alert('Need at least 3 players to start!');return;}
+  const maxRounds=parseInt(document.getElementById('lRounds').value);
+  const word=FRUITS[Math.floor(Math.random()*FRUITS.length)];
+  const imp=room.players[Math.floor(Math.random()*room.players.length)];
+  Object.assign(room,{
+    started:true,word,impostorName:imp.name,
+    phase:'countdown',maxRounds,currentRound:1,
+    currentTurnIndex:0,messages:[],votes:{},eliminated:[],
+    tieResult:false,eliminatedPlayer:'',wasImpostor:false
+  });
+  await saveRoom(room);
+  clearInterval(poller);
+  G.phase='countdown';
+  G.isImp=G.name===imp.name;
+  beginCountdown(room);
+}
+
+// ─── Countdown ────────────────────────────────────────────
+function beginCountdown(room){
+  G.isImp=G.name===room.impostorName;
+  const wd=document.getElementById('cdWord');
+  if(G.isImp){
+    wd.className='word-reveal imp';
+    wd.innerHTML='<div class="wlabel">Your role</div><div class="word">IMPOSTOR</div>';
+  } else {
+    wd.className='word-reveal';
+    wd.innerHTML='<div class="wlabel">Your word</div><div class="word">'+room.word+'</div>';
+  }
+  go('sCountdown');
+  let t=10;
+  document.getElementById('cdNum').textContent=t;
+  const ci=setInterval(async()=>{
+    t--;
+    document.getElementById('cdNum').textContent=t;
+    if(t<=0){
+      clearInterval(ci);
+      if(G.isHost){const r=await getRoom();if(r){r.phase='discussion';await saveRoom(r);}}
+      G.phase='discussion';
+      go('sDiscuss');
+      const r=await getRoom();if(r)updateDiscussion(r);
+      startPoll();
+    }
+  },1000);
+}
+
+// ─── Discussion ───────────────────────────────────────────
+function updateDiscussion(room){
+  document.getElementById('dRound').textContent=`Round ${room.currentRound}/${room.maxRounds}`;
+  const active=room.players.filter(p=>!room.eliminated.includes(p.name));
+  const cur=active[room.currentTurnIndex%active.length];
+  const mine=cur&&cur.name===G.name;
+  const dT=document.getElementById('dTurn');
+  dT.textContent=mine?'Your turn to speak!':(cur?cur.name+"'s turn to speak":'...');
+  dT.className='turn-bar'+(mine?' mine':'');
+  document.getElementById('dInput').style.display=mine?'block':'none';
+  document.getElementById('dWait').style.display=mine?'none':'block';
+  const mc=document.getElementById('dMsgs');
+  mc.innerHTML=room.messages.map(m=>`<div class="msg"><div class="ma">${esc(m.a)}</div><div class="mt">${esc(m.t)}</div></div>`).join('');
+  mc.scrollTop=mc.scrollHeight;
+}
+
+async function sendMsg(){
+  const txt=document.getElementById('dText').value.trim();
+  if(!txt)return;
+  document.getElementById('dText').value='';
+  const room=await getRoom();if(!room)return;
+  room.messages.push({a:G.name,t:txt});
+  room.currentTurnIndex++;
+  const active=room.players.filter(p=>!room.eliminated.includes(p.name));
+  if(room.currentTurnIndex%active.length===0){
+    if(room.currentRound>=room.maxRounds){room.phase='voting';room.votes={};}
+    else{room.currentRound++;}
+  }
+  await saveRoom(room);
+  updateDiscussion(room);
+  if(room.phase==='voting'){G.phase='voting';go('sVote');renderVote(room);}
+}
+
+// ─── Voting ───────────────────────────────────────────────
+function renderVote(room){
+  const active=room.players.filter(p=>!room.eliminated.includes(p.name));
+  document.getElementById('vOptions').innerHTML=active
+    .map(p=>`<div class="vote-opt" id="vo_${p.name}" onclick="selVote('${p.name}')">${esc(p.name)}</div>`)
+    .join('');
+  const btn=document.getElementById('vBtn');
+  btn.disabled=false;btn.textContent='Submit vote';
+  document.getElementById('vWait').style.display='none';
+  document.getElementById('vErr').textContent='';
+  G.voted=false;G.selVote=null;
+}
+
+function selVote(name){
+  G.selVote=name;
+  document.querySelectorAll('.vote-opt').forEach(o=>o.classList.remove('sel'));
+  const el=document.getElementById('vo_'+name);if(el)el.classList.add('sel');
+}
+
+async function submitVote(){
+  if(!G.selVote){document.getElementById('vErr').textContent='Select a player first';return;}
+  document.getElementById('vErr').textContent='';
+  const room=await getRoom();if(!room)return;
+  if(!room.votes)room.votes={};
+  room.votes[G.name]=G.selVote;
+  G.voted=true;
+  await saveRoom(room);
+  const btn=document.getElementById('vBtn');
+  btn.disabled=true;btn.textContent='Voted ✓';
+  document.getElementById('vWait').style.display='block';
+  checkAllVoted(room);
+}
+
+async function checkAllVoted(room){
+  const active=room.players.filter(p=>!room.eliminated.includes(p.name));
+  if(Object.keys(room.votes||{}).length>=active.length&&G.isHost){
+    await calcResults();
+  }
+}
+
+async function calcResults(){
+  const room=await getRoom();if(!room)return;
+  const vc={};
+  Object.values(room.votes).forEach(v=>{vc[v]=(vc[v]||0)+1;});
+  let mx=0,elim=[];
+  Object.entries(vc).forEach(([p,c])=>{if(c>mx){mx=c;elim=[p];}else if(c===mx){elim.push(p);}});
+  if(elim.length>1){
+    room.tieResult=true;room.currentRound++;
+    room.currentTurnIndex=0;room.messages=[];room.votes={};room.phase='discussion';
+  } else {
+    room.eliminatedPlayer=elim[0];
+    room.eliminated.push(elim[0]);
+    room.wasImpostor=elim[0]===room.impostorName;
+    room.tieResult=false;room.phase='results';
+  }
+  await saveRoom(room);
+  if(room.phase==='results'){G.phase='results';showResults(room);}
+  else{G.phase='discussion';go('sDiscuss');const r=await getRoom();if(r)updateDiscussion(r);startPoll();}
+}
+
+// ─── Results ──────────────────────────────────────────────
+function showResults(room){
+  go('sResults');
+  if(room.tieResult){
+    document.getElementById('rMain').className='res-card';
+    document.getElementById('rMain').innerHTML='<div class="res-big">Tie!</div><p style="color:var(--t2)">No one eliminated — another discussion starts.</p>';
+    document.getElementById('rReveal').style.display='none';
+    document.getElementById('rBtn').textContent='Start next round';
+  } else {
+    document.getElementById('rReveal').style.display='block';
+    document.getElementById('rImpName').textContent=room.impostorName;
+    document.getElementById('rWord').textContent=room.word;
+    if(room.wasImpostor){
+      document.getElementById('rMain').className='res-card win';
+      document.getElementById('rMain').innerHTML=`<div class="res-big">Impostor caught!</div><p><strong>${esc(room.eliminatedPlayer)}</strong> was the impostor. Team wins!</p>`;
+    } else {
+      document.getElementById('rMain').className='res-card lose';
+      document.getElementById('rMain').innerHTML=`<div class="res-big">Wrong call...</div><p><strong>${esc(room.eliminatedPlayer)}</strong> was innocent. The impostor escapes!</p>`;
+    }
+    document.getElementById('rBtn').textContent='Back to lobby';
+  }
+}
+
+async function contResults(){
+  const room=await getRoom();if(!room)return;
+  if(room.tieResult){
+    room.tieResult=false;room.phase='discussion';
+    await saveRoom(room);
+    G.phase='discussion';go('sDiscuss');updateDiscussion(room);startPoll();
+  } else {
+    await leaveRoom();
+  }
+}
+
+// ─── Leave / reset ────────────────────────────────────────
+async function leaveRoom(){
+  clearInterval(poller);
+  if(G.room){
+    try{
+      const room=await getRoom();
+      if(room){
+        room.players=room.players.filter(p=>p.name!==G.name);
+        if(room.players.length===0||G.isHost){await store.del('room:'+G.room);}
+        else{room.host=room.players[0].name;await saveRoom(room);}
+      }
+    }catch{}
+  }
+  resetHome();
+}
+
+function resetHome(){
+  G={room:null,name:null,isHost:false,isImp:false,phase:'home',voted:false,selVote:null};
+  go('sHome');
+}
+
+function esc(s){
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+</script>
 </body>
 </html>
