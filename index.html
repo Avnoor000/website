@@ -3,211 +3,406 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Impostor Game — Fruits</title>
-  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
+  <title>Impostor — Fruits</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
   <style>
     *{box-sizing:border-box;margin:0;padding:0}
     :root{
-      --p:#7F77DD;--p2:#3C3489;--red:#D85A30;
-      --bg:#ffffff;--bg2:#f5f5f3;--t:#1a1a18;--t2:#888780;--b:rgba(0,0,0,0.12);
+      --p:#7F77DD;--p-dark:#3C3489;--p-light:#EEEDFE;
+      --red:#D85A30;--red-light:#FAECE7;
+      --green:#3B6D11;--green-light:#EAF3DE;--green-mid:#97C459;
+      --amber:#BA7517;--amber-light:#FAEEDA;
+      --bg:#0f0f0d;--bg2:#1a1a17;--bg3:#242420;
+      --surface:#1e1e1b;--surface2:#2a2a26;
+      --t:#f1efe8;--t2:#888780;--t3:#555450;
+      --b:rgba(255,255,255,0.08);--b2:rgba(255,255,255,0.14);
     }
-    @media(prefers-color-scheme:dark){
-      :root{--bg:#1a1a18;--bg2:#2c2c2a;--t:#f1efe8;--t2:#888780;--b:rgba(255,255,255,0.12);}
-    }
-    body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--t);min-height:100vh;display:flex;justify-content:center;align-items:flex-start;padding:20px}
-    #app{width:100%;max-width:480px;padding:1.5rem 1rem}
-    h1{font-family:'Syne',sans-serif;font-weight:800;font-size:1.8rem;color:var(--t)}
-    h2{font-family:'Syne',sans-serif;font-weight:700;font-size:1.2rem;color:var(--t)}
-    input,textarea,select{width:100%;padding:10px 14px;border:1px solid var(--b);border-radius:8px;background:var(--bg);color:var(--t);font-family:'DM Sans',sans-serif;font-size:15px;margin-top:6px;outline:none}
-    input:focus,textarea:focus,select:focus{border-color:var(--p)}
-    label{font-size:13px;color:var(--t2);display:block;margin-top:14px}
-    .btn{display:block;width:100%;padding:12px;border-radius:10px;border:none;font-family:'Syne',sans-serif;font-weight:700;font-size:15px;cursor:pointer;margin-top:12px;transition:opacity .15s,transform .1s;background:var(--p);color:#fff}
-    .btn:hover{opacity:.9;transform:translateY(-1px)}
+    body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--t);min-height:100vh}
+
+    .screen{display:none}
+    .screen.on{display:flex;flex-direction:column;min-height:100vh;animation:fi .2s ease}
+    @keyframes fi{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+
+    h1{font-family:'Syne',sans-serif;font-weight:800}
+    h2{font-family:'Syne',sans-serif;font-weight:700}
+    h3{font-family:'Syne',sans-serif;font-weight:700}
+
+    .btn{display:block;width:100%;padding:13px 18px;border-radius:10px;border:none;font-family:'Syne',sans-serif;font-weight:700;font-size:15px;cursor:pointer;transition:all .15s;background:var(--p);color:#fff;text-align:center}
+    .btn:hover{background:#9890e8;transform:translateY(-1px)}
     .btn:active{transform:scale(.98)}
-    .btn.sec{background:var(--bg2);color:var(--t);border:1px solid var(--b)}
-    .btn.danger{background:var(--red);color:#fff}
-    .btn:disabled{opacity:.4;cursor:not-allowed}
-    .screen{display:none;animation:fi .25s ease}
-    .screen.on{display:block}
-    @keyframes fi{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
-    .code-box{background:var(--bg2);border:1px solid var(--b);border-radius:12px;padding:1.2rem;text-align:center;margin:1rem 0}
-    .code-box .code{font-family:'Syne',sans-serif;font-size:2.4rem;font-weight:800;letter-spacing:6px;color:var(--p)}
-    .pill{display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:500;background:#AFA9EC;color:#26215C}
-    .player-row{display:flex;justify-content:space-between;align-items:center;padding:10px 14px;border-radius:8px;background:var(--bg2);border:1px solid var(--b);margin-top:8px}
-    .word-reveal{border-radius:16px;padding:2.5rem 1.5rem;text-align:center;margin:1rem 0;background:var(--p)}
-    .word-reveal.imp{background:var(--red)}
-    .word-reveal .wlabel{font-size:12px;color:rgba(255,255,255,.7);letter-spacing:2px;text-transform:uppercase;margin-bottom:8px}
-    .word-reveal .word{font-family:'Syne',sans-serif;font-size:2.8rem;font-weight:800;color:#fff;letter-spacing:2px}
-    .count-big{font-family:'Syne',sans-serif;font-size:5rem;font-weight:800;color:var(--p);text-align:center;margin:1.5rem 0}
-    .round-badge{display:inline-block;background:#EEEDFE;color:#3C3489;padding:5px 16px;border-radius:20px;font-size:13px;font-weight:500;margin-bottom:12px}
-    .turn-bar{padding:12px;border-radius:10px;text-align:center;font-weight:500;font-size:14px;margin:10px 0;background:var(--bg2);border:1px solid var(--b)}
-    .turn-bar.mine{background:#EAF3DE;color:#3B6D11;border-color:#97C459}
-    .msgs{max-height:260px;overflow-y:auto;margin:10px 0;display:flex;flex-direction:column;gap:8px}
-    .msg{background:var(--bg2);padding:10px 14px;border-radius:10px;border:1px solid var(--b)}
-    .msg .ma{font-size:12px;color:var(--p);font-weight:500;margin-bottom:3px}
+    .btn:disabled{opacity:.35;cursor:not-allowed;transform:none}
+    .btn.sec{background:var(--surface2);color:var(--t);border:1px solid var(--b2)}
+    .btn.sec:hover{background:var(--bg3)}
+    .btn.danger{background:#711B13;color:#fff}
+    .btn.danger:hover{background:var(--red)}
+    .btn.green{background:#27500A;color:#C0DD97;border:1px solid #3B6D11}
+    .btn.green:hover{background:#3B6D11;color:#fff}
+
+    input,textarea,select{width:100%;padding:11px 14px;border:1px solid var(--b2);border-radius:8px;background:var(--surface);color:var(--t);font-family:'DM Sans',sans-serif;font-size:15px;outline:none;transition:border-color .15s}
+    input:focus,textarea:focus,select:focus{border-color:var(--p)}
+    label{font-size:11px;color:var(--t2);display:block;margin-bottom:5px;letter-spacing:.8px;text-transform:uppercase}
+    .field{margin-bottom:16px}
+    .err{color:#F0997B;font-size:13px;margin-top:6px;min-height:16px}
+
+    .pill{display:inline-block;padding:2px 9px;border-radius:20px;font-size:11px;font-weight:500}
+    .pill.host{background:#534AB7;color:#EEEDFE}
+    .pill.imp{background:#711B13;color:#F5C4B3}
+    .pill.safe{background:#173404;color:#C0DD97}
+    .pill.voted{background:#2C2C2A;color:#888780}
+    .pill.elim{background:#2C2C2A;color:#555450;text-decoration:line-through}
+
+    /* ── HOME ── */
+    #sHome{justify-content:center;align-items:center;padding:2rem}
+    .home-inner{width:100%;max-width:400px}
+    .logo{font-family:'Syne',sans-serif;font-weight:800;font-size:2.6rem;line-height:1;margin-bottom:4px}
+    .logo span{color:var(--p)}
+    .logo-sub{font-size:13px;color:var(--t2);margin-bottom:2.5rem}
+
+    /* ── JOIN ── */
+    #sJoin{justify-content:center;align-items:center;padding:2rem}
+    .join-inner{width:100%;max-width:400px}
+
+    /* ── HOST BAR (shared top bar for host screens) ── */
+    .host-bar{background:var(--surface);border-bottom:1px solid var(--b);padding:10px 20px;display:flex;align-items:center;gap:12px;flex-shrink:0;flex-wrap:wrap}
+    .host-bar .gt{font-family:'Syne',sans-serif;font-weight:800;font-size:1rem;color:var(--t)}
+    .host-bar .room-chip{font-family:'DM Mono',monospace;background:var(--p-dark);color:var(--p-light);padding:4px 14px;border-radius:6px;font-size:16px;letter-spacing:4px}
+    .host-bar .phase-chip{font-size:11px;color:var(--t2);border:1px solid var(--b2);padding:3px 10px;border-radius:20px;margin-left:auto}
+    .host-bar .word-chip{font-family:'DM Mono',monospace;font-size:12px;color:#C0DD97;background:#0a1a05;border:1px solid var(--green);padding:4px 12px;border-radius:6px}
+
+    /* ── HOST LOBBY ── */
+    .lobby-body{flex:1;display:grid;grid-template-columns:240px 1fr;overflow:hidden}
+    @media(max-width:680px){.lobby-body{grid-template-columns:1fr;grid-template-rows:auto 1fr}}
+
+    .host-sidebar{background:var(--surface);border-right:1px solid var(--b);padding:16px;overflow-y:auto;display:flex;flex-direction:column;gap:6px}
+    .sidebar-label{font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;padding-bottom:6px;border-bottom:1px solid var(--b)}
+
+    .p-card{background:var(--bg2);border:1px solid var(--b);border-radius:8px;padding:9px 12px;transition:border-color .2s}
+    .p-card.speaking{border-color:var(--p);background:#16152b}
+    .p-card.elimed{opacity:.35}
+    .p-card .pn{font-size:14px;font-weight:500;color:var(--t);margin-bottom:4px}
+    .p-card .pm{display:flex;gap:5px;flex-wrap:wrap;align-items:center}
+    .vote-ct{font-size:11px;color:#EF9F27;font-family:'DM Mono',monospace;margin-left:auto}
+
+    .host-main{padding:20px;overflow-y:auto;display:flex;flex-direction:column;gap:16px}
+    .panel{background:var(--surface);border:1px solid var(--b);border-radius:12px;padding:16px}
+    .ptitle{font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:1px;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--b)}
+
+    /* ── HOST GAME HUB ── */
+    .game-body{flex:1;display:grid;grid-template-columns:230px 1fr;overflow:hidden}
+    @media(max-width:680px){.game-body{grid-template-columns:1fr;overflow-y:auto}}
+
+    .stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+    .sbox{background:var(--bg2);border:1px solid var(--b);border-radius:10px;padding:12px;text-align:center}
+    .sbox .sv{font-family:'Syne',sans-serif;font-size:1.5rem;font-weight:800;color:var(--p)}
+    .sbox .sl{font-size:10px;color:var(--t2);margin-top:2px;text-transform:uppercase;letter-spacing:.5px}
+
+    .turn-indicator{background:#16152b;border:1px solid var(--p-dark);border-radius:10px;padding:12px 16px;display:flex;align-items:center;gap:12px}
+    .turn-dot{width:8px;height:8px;border-radius:50%;background:var(--p);flex-shrink:0;animation:blink 1.2s ease infinite}
+    @keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+    .turn-name{font-family:'Syne',sans-serif;font-weight:700;font-size:.95rem;color:var(--p-light)}
+
+    .feed{display:flex;flex-direction:column;gap:6px;max-height:220px;overflow-y:auto}
+    .fmsg{background:var(--bg2);border:1px solid var(--b);border-radius:8px;padding:9px 12px}
+    .fmsg .fa{font-size:11px;color:var(--p);font-family:'DM Mono',monospace;margin-bottom:2px}
+    .fmsg .ft{font-size:14px;color:var(--t)}
+    .fmsg.sys{background:transparent;border-color:transparent}
+    .fmsg.sys .ft{color:var(--t3);font-size:12px;font-style:italic}
+
+    .vbar-row{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+    .vbar-label{font-size:13px;color:var(--t);min-width:80px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .vbar-track{flex:1;height:5px;background:var(--bg3);border-radius:3px;overflow:hidden}
+    .vbar-fill{height:100%;background:var(--p);border-radius:3px;transition:width .4s}
+    .vbar-n{font-size:11px;color:var(--t2);font-family:'DM Mono',monospace;min-width:16px;text-align:right}
+
+    /* ── HOST RESULTS ── */
+    .results-body{flex:1;display:grid;grid-template-columns:1fr 1fr;gap:20px;padding:20px;overflow-y:auto}
+    @media(max-width:580px){.results-body{grid-template-columns:1fr}}
+    .host-footer{padding:14px 20px;border-top:1px solid var(--b);display:flex;gap:10px;flex-shrink:0}
+
+    /* ── PLAYER SCREENS ── */
+    .pscreen{justify-content:center;align-items:center;padding:1.5rem}
+    .pinner{width:100%;max-width:380px}
+
+    .word-card{border-radius:16px;padding:2.2rem 1.5rem;text-align:center;margin-bottom:16px;background:linear-gradient(135deg,var(--p-dark),var(--p))}
+    .word-card.imp{background:linear-gradient(135deg,#501313,var(--red))}
+    .word-card .wl{font-size:11px;color:rgba(255,255,255,.55);letter-spacing:2px;text-transform:uppercase;margin-bottom:10px}
+    .word-card .w{font-family:'Syne',sans-serif;font-size:3rem;font-weight:800;color:#fff;letter-spacing:2px}
+
+    .count-num{font-family:'Syne',sans-serif;font-size:6rem;font-weight:800;color:var(--p);text-align:center;line-height:1;margin:1rem 0}
+
+    .turn-banner{border-radius:10px;padding:12px;text-align:center;font-size:15px;font-weight:500;background:var(--surface2);border:1px solid var(--b2);margin-bottom:12px;color:var(--t)}
+    .turn-banner.mine{background:#0f1f08;border-color:var(--green-mid);color:var(--green-light)}
+
+    .msgs{display:flex;flex-direction:column;gap:7px;max-height:250px;overflow-y:auto;margin-bottom:12px}
+    .msg{background:var(--surface);border:1px solid var(--b);border-radius:9px;padding:10px 13px}
+    .msg .ma{font-size:11px;color:var(--p);font-family:'DM Mono',monospace;margin-bottom:3px}
     .msg .mt{font-size:14px;color:var(--t)}
-    .vote-opt{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:10px;border:1px solid var(--b);background:var(--bg2);margin-top:8px;cursor:pointer;transition:border-color .15s,background .15s}
-    .vote-opt:hover{border-color:var(--p)}
-    .vote-opt.sel{background:#EEEDFE;border-color:var(--p);color:#3C3489}
-    .res-card{border-radius:14px;padding:1.5rem;text-align:center;margin:1rem 0;border:2px solid var(--b)}
-    .res-card.win{background:#EAF3DE;border-color:#97C459}
-    .res-card.lose{background:#FAECE7;border-color:#F0997B}
-    .res-card.imp-reveal{background:var(--p);color:#fff}
-    .res-big{font-family:'Syne',sans-serif;font-size:1.5rem;font-weight:800;margin-bottom:8px}
-    .status{font-size:13px;color:var(--t2);text-align:center;margin:8px 0}
-    .err{color:var(--red);font-size:13px;margin-top:6px;min-height:18px}
-    .stats{display:flex;gap:12px;margin:10px 0}
-    .stat{flex:1;background:var(--bg2);border-radius:10px;padding:12px;text-align:center;border:1px solid var(--b)}
-    .stat .sv{font-family:'Syne',sans-serif;font-size:1.8rem;font-weight:800;color:var(--p)}
-    .stat .sl{font-size:12px;color:var(--t2);margin-top:2px}
     textarea{resize:none;height:70px}
-    .spinner{width:18px;height:18px;border:2px solid var(--b);border-top-color:var(--p);border-radius:50%;animation:spin 0.7s linear infinite;display:inline-block;vertical-align:middle;margin-right:6px}
+
+    .vopt{padding:13px 16px;border-radius:10px;border:1px solid var(--b2);background:var(--surface);margin-bottom:8px;cursor:pointer;transition:all .15s;font-size:15px;color:var(--t)}
+    .vopt:hover{border-color:var(--p)}
+    .vopt.sel{background:#16152b;border-color:var(--p);color:var(--p-light)}
+
+    .res-card{border-radius:12px;padding:1.4rem;margin-bottom:12px;border:1px solid var(--b)}
+    .res-card.win{background:#0d1f07;border-color:var(--green-mid)}
+    .res-card.lose{background:#1f0d08;border-color:var(--red)}
+    .res-card.reveal-card{background:linear-gradient(135deg,var(--p-dark),var(--p));border:none}
+    .res-big{font-family:'Syne',sans-serif;font-size:1.5rem;font-weight:800;margin-bottom:8px}
+
+    .rbadge{display:inline-block;background:var(--p-dark);color:var(--p-light);padding:4px 14px;border-radius:20px;font-size:12px;font-weight:500;margin-bottom:10px}
+    .status{font-size:13px;color:var(--t2);text-align:center;padding:8px 0}
+    .spinner{width:15px;height:15px;border:2px solid var(--b2);border-top-color:var(--p);border-radius:50%;animation:spin .7s linear infinite;display:inline-block;vertical-align:middle;margin-right:6px}
     @keyframes spin{to{transform:rotate(360deg)}}
+
+    ::-webkit-scrollbar{width:3px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--b2);border-radius:2px}
   </style>
 </head>
 <body>
-<div id="app">
 
-  <!-- Home -->
-  <div id="sHome" class="screen on">
-    <h1 style="margin-bottom:4px">Impostor 🍎</h1>
-    <p style="font-size:13px;color:var(--t2);margin-bottom:1.5rem">Fruits Edition — cross-device multiplayer</p>
-    <label>Your name</label>
-    <input id="hName" placeholder="Enter your name" maxlength="20">
+<!-- ═══════ HOME ═══════ -->
+<div id="sHome" class="screen on">
+  <div class="home-inner">
+    <div class="logo">Impostor<span>.</span></div>
+    <div class="logo-sub">Fruits Edition — host serves, players connect on any device</div>
+    <div class="field">
+      <label>Your name</label>
+      <input id="hName" placeholder="Enter your name" maxlength="20">
+    </div>
     <div id="hErr" class="err"></div>
-    <button class="btn" onclick="createRoom()">Create room</button>
-    <button class="btn sec" onclick="go('sJoin')">Join a room</button>
+    <button class="btn" onclick="createRoom()">Create room &amp; host</button>
+    <button class="btn sec" onclick="go('sJoin')" style="margin-top:10px">Join a room</button>
   </div>
+</div>
 
-  <!-- Join -->
-  <div id="sJoin" class="screen">
-    <h1 style="margin-bottom:1rem">Join room</h1>
-    <label>Your name</label>
-    <input id="jName" placeholder="Enter your name" maxlength="20">
-    <label>Room code</label>
-    <input id="jCode" placeholder="6-digit code" maxlength="6" style="text-transform:uppercase;letter-spacing:3px">
+<!-- ═══════ JOIN ═══════ -->
+<div id="sJoin" class="screen">
+  <div class="join-inner">
+    <h1 style="font-size:1.8rem;margin-bottom:1.5rem">Join room</h1>
+    <div class="field">
+      <label>Your name</label>
+      <input id="jName" placeholder="Enter your name" maxlength="20">
+    </div>
+    <div class="field">
+      <label>Room code</label>
+      <input id="jCode" placeholder="000000" maxlength="6" style="font-family:'DM Mono',monospace;letter-spacing:5px;font-size:1.3rem">
+    </div>
     <div id="jErr" class="err"></div>
     <button class="btn" onclick="joinRoom()">Join room</button>
-    <button class="btn sec" onclick="go('sHome')">Back</button>
+    <button class="btn sec" onclick="go('sHome')" style="margin-top:10px">Back</button>
   </div>
+</div>
 
-  <!-- Lobby -->
-  <div id="sLobby" class="screen">
-    <h1 style="margin-bottom:.5rem">Lobby</h1>
-    <div class="code-box">
-      <div style="font-size:12px;color:var(--t2);margin-bottom:4px">Share this code</div>
-      <div class="code" id="lCode">——</div>
-    </div>
-    <div class="stats">
-      <div class="stat"><div class="sv" id="lCount">0</div><div class="sl">Players</div></div>
-      <div class="stat"><div class="sv">1</div><div class="sl">Impostor</div></div>
-    </div>
-    <div id="lPlayers" style="margin:8px 0"></div>
-    <div id="lHostCtrl" style="display:none">
-      <label>Discussion rounds</label>
-      <select id="lRounds">
-        <option value="1">1 round</option>
-        <option value="2">2 rounds</option>
-        <option value="3" selected>3 rounds</option>
-        <option value="4">4 rounds</option>
-        <option value="5">5 rounds</option>
-      </select>
-      <button class="btn" onclick="startGame()">Start game</button>
-    </div>
-    <div id="lWait" class="status" style="display:none"><span class="spinner"></span>Waiting for host to start...</div>
-    <button class="btn sec danger" onclick="leaveRoom()" style="margin-top:8px">Leave room</button>
+<!-- ═══════ HOST LOBBY ═══════ -->
+<div id="sHostLobby" class="screen">
+  <div class="host-bar">
+    <span class="gt">🍎 Impostor</span>
+    <span class="room-chip" id="hlCode">——</span>
+    <span class="phase-chip">LOBBY</span>
   </div>
-
-  <!-- Countdown -->
-  <div id="sCountdown" class="screen">
-    <h1 style="text-align:center;margin-bottom:.5rem">Memorise your word</h1>
-    <div id="cdWord" class="word-reveal"><div class="wlabel">Your word</div><div class="word">?</div></div>
-    <div class="count-big" id="cdNum">10</div>
-    <p class="status">Game begins when countdown ends</p>
-  </div>
-
-  <!-- Discussion -->
-  <div id="sDiscuss" class="screen">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
-      <h2>Discussion</h2>
-      <span class="round-badge" id="dRound">Round 1/3</span>
+  <div class="lobby-body">
+    <div class="host-sidebar">
+      <div class="sidebar-label">Connected players <span id="hlCount" style="color:var(--p);float:right;font-family:'DM Mono',monospace">0</span></div>
+      <div id="hlPlayers"></div>
+      <div style="margin-top:auto;padding-top:14px">
+        <button class="btn danger" onclick="leaveRoom()">Close room</button>
+      </div>
     </div>
-    <div class="turn-bar" id="dTurn">Waiting...</div>
-    <div class="msgs" id="dMsgs"></div>
-    <div id="dInput" style="display:none">
-      <textarea id="dText" placeholder="Type your message..." maxlength="200"></textarea>
+    <div class="host-main">
+      <div class="panel">
+        <div class="ptitle">Game settings</div>
+        <div class="field">
+          <label>Discussion rounds</label>
+          <select id="hlRounds">
+            <option value="1">1 round</option>
+            <option value="2">2 rounds</option>
+            <option value="3" selected>3 rounds</option>
+            <option value="4">4 rounds</option>
+            <option value="5">5 rounds</option>
+          </select>
+        </div>
+        <button class="btn green" onclick="startGame()" id="hlStartBtn" disabled>Waiting for players...</button>
+      </div>
+      <div class="panel">
+        <div class="ptitle">How to play</div>
+        <p style="font-size:13px;color:var(--t2);line-height:1.8">
+          Share the room code with your friends. They open this page on their own device and tap <strong style="color:var(--t)">Join a room</strong>.<br><br>
+          This device is the game server — it controls the game and shows you everything. Keep it on and visible to all players.
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════ HOST GAME HUB ═══════ -->
+<div id="sHostGame" class="screen">
+  <div class="host-bar">
+    <span class="gt">🍎 Impostor</span>
+    <span class="room-chip" id="hgCode">——</span>
+    <span class="word-chip" id="hgWord">WORD: —</span>
+    <span class="phase-chip" id="hgPhase">DISCUSSION</span>
+  </div>
+  <div class="game-body">
+    <div class="host-sidebar">
+      <div class="sidebar-label">Players</div>
+      <div id="hgPlayers"></div>
+    </div>
+    <div class="host-main">
+      <div class="stats-row">
+        <div class="sbox"><div class="sv" id="hgRound">1/3</div><div class="sl">Round</div></div>
+        <div class="sbox"><div class="sv" id="hgMsgs">0</div><div class="sl">Messages</div></div>
+        <div class="sbox"><div class="sv" id="hgVotes">0</div><div class="sl">Votes in</div></div>
+      </div>
+      <div class="panel" id="hgTurnPanel">
+        <div class="ptitle">Now speaking</div>
+        <div class="turn-indicator"><div class="turn-dot"></div><div class="turn-name" id="hgTurnName">—</div></div>
+      </div>
+      <div class="panel" style="flex:1;display:flex;flex-direction:column">
+        <div class="ptitle">Live feed</div>
+        <div class="feed" id="hgFeed"></div>
+      </div>
+      <div class="panel" id="hgVotePanel" style="display:none">
+        <div class="ptitle">Vote tally</div>
+        <div id="hgTally"></div>
+        <button class="btn green" onclick="forceResults()" id="hgForceBtn" style="margin-top:12px;display:none">Calculate results</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════ HOST RESULTS ═══════ -->
+<div id="sHostResults" class="screen">
+  <div class="host-bar">
+    <span class="gt">🍎 Impostor</span>
+    <span class="room-chip" id="hrCode">——</span>
+    <span class="phase-chip">RESULTS</span>
+  </div>
+  <div class="results-body">
+    <div class="panel" id="hrMain"></div>
+    <div class="panel" style="background:linear-gradient(135deg,var(--p-dark) 0%,var(--p) 100%);border:none">
+      <div class="ptitle" style="color:rgba(255,255,255,.4);border-color:rgba(255,255,255,.15)">The impostor was</div>
+      <div style="font-family:'Syne',sans-serif;font-size:2rem;font-weight:800;color:#fff;margin:10px 0" id="hrImpName">—</div>
+      <div style="color:rgba(255,255,255,.65);font-size:13px">Secret word: <span id="hrWord" style="color:#fff;font-family:'DM Mono',monospace">—</span></div>
+      <div style="margin-top:16px;display:flex;gap:6px;flex-wrap:wrap" id="hrVotes"></div>
+    </div>
+  </div>
+  <div class="host-footer">
+    <button class="btn green" onclick="hostPlayAgain()" style="flex:1">Play again</button>
+    <button class="btn danger" onclick="leaveRoom()" style="flex:1">Close room</button>
+  </div>
+</div>
+
+<!-- ═══════ PLAYER: LOBBY ═══════ -->
+<div id="sPlayerLobby" class="screen pscreen">
+  <div class="pinner">
+    <h1 style="font-size:1.8rem;margin-bottom:4px">Lobby</h1>
+    <p style="font-size:13px;color:var(--t2);margin-bottom:1.2rem">Connected — waiting for host to start</p>
+    <div class="panel" style="background:var(--surface);border:1px solid var(--b);border-radius:12px;padding:14px;margin-bottom:14px">
+      <div style="font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">
+        Room <span id="plCode" style="font-family:'DM Mono',monospace;color:var(--p);font-size:14px;letter-spacing:3px"></span>
+      </div>
+      <div id="plPlayers"></div>
+    </div>
+    <div class="status"><span class="spinner"></span>Waiting for host to start...</div>
+    <button class="btn danger" onclick="leaveRoom()" style="margin-top:10px">Leave room</button>
+  </div>
+</div>
+
+<!-- ═══════ PLAYER: COUNTDOWN ═══════ -->
+<div id="sPlayerCountdown" class="screen pscreen">
+  <div class="pinner" style="text-align:center">
+    <div style="font-size:11px;color:var(--t2);margin-bottom:14px;text-transform:uppercase;letter-spacing:1.5px">Memorise your word</div>
+    <div id="pcWord" class="word-card"><div class="wl">Your word</div><div class="w">?</div></div>
+    <div class="count-num" id="pcNum">10</div>
+    <p style="font-size:13px;color:var(--t2)">Game starts when countdown ends</p>
+  </div>
+</div>
+
+<!-- ═══════ PLAYER: DISCUSSION ═══════ -->
+<div id="sPlayerDiscuss" class="screen pscreen" style="align-items:flex-start;padding-top:1.2rem">
+  <div class="pinner" style="max-width:100%;padding:0 1rem">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+      <h2 style="font-size:1.1rem">Discussion</h2>
+      <span class="rbadge" id="pdRound">Round 1/3</span>
+    </div>
+    <div class="turn-banner" id="pdTurn">Waiting...</div>
+    <div class="msgs" id="pdMsgs"></div>
+    <div id="pdInput" style="display:none">
+      <textarea id="pdText" placeholder="Type your message..." maxlength="200"></textarea>
       <button class="btn" onclick="sendMsg()" style="margin-top:8px">Send</button>
     </div>
-    <p class="status" id="dWait" style="display:none"><span class="spinner"></span>Waiting for their turn...</p>
+    <div id="pdWait" class="status" style="display:none"><span class="spinner"></span>Waiting for their turn...</div>
   </div>
+</div>
 
-  <!-- Vote -->
-  <div id="sVote" class="screen">
-    <h1 style="margin-bottom:.3rem">Vote</h1>
-    <p class="status" style="margin-bottom:1rem">Who do you think is the impostor?</p>
-    <div id="vOptions"></div>
-    <div id="vErr" class="err"></div>
-    <button class="btn" onclick="submitVote()" id="vBtn">Submit vote</button>
-    <p class="status" id="vWait" style="display:none"><span class="spinner"></span>Waiting for all votes...</p>
+<!-- ═══════ PLAYER: VOTE ═══════ -->
+<div id="sPlayerVote" class="screen pscreen">
+  <div class="pinner">
+    <h1 style="font-size:1.8rem;margin-bottom:4px">Vote</h1>
+    <p style="font-size:13px;color:var(--t2);margin-bottom:1.2rem">Who is the impostor?</p>
+    <div id="pvOptions"></div>
+    <div id="pvErr" class="err"></div>
+    <button class="btn" onclick="submitVote()" id="pvBtn">Submit vote</button>
+    <div id="pvWait" class="status" style="display:none"><span class="spinner"></span>Waiting for all votes...</div>
   </div>
+</div>
 
-  <!-- Results -->
-  <div id="sResults" class="screen">
-    <h1 style="margin-bottom:1rem">Results</h1>
-    <div id="rMain" class="res-card"></div>
-    <div id="rReveal" class="res-card imp-reveal" style="display:none">
+<!-- ═══════ PLAYER: RESULTS ═══════ -->
+<div id="sPlayerResults" class="screen pscreen">
+  <div class="pinner">
+    <h1 style="font-size:1.8rem;margin-bottom:1rem">Results</h1>
+    <div id="prMain" class="res-card"></div>
+    <div class="res-card reveal-card" id="prReveal" style="display:none">
       <div class="res-big" style="color:#fff">The impostor was...</div>
-      <div style="font-size:1.6rem;color:#fff;margin:8px 0" id="rImpName">-</div>
-      <div style="color:rgba(255,255,255,.8);font-size:13px">The word was: <strong id="rWord">-</strong></div>
+      <div style="font-size:1.4rem;color:#fff;margin:6px 0;font-family:'Syne',sans-serif;font-weight:700" id="prImpName">—</div>
+      <div style="color:rgba(255,255,255,.65);font-size:13px">Secret word: <span id="prWord" style="color:#fff;font-family:'DM Mono',monospace">—</span></div>
     </div>
-    <button class="btn" onclick="contResults()" id="rBtn">Continue</button>
+    <button class="btn sec" onclick="playerBackToLobby()" style="margin-top:8px">Back to lobby</button>
   </div>
-
 </div>
 
 <script>
-// ─── Config ───────────────────────────────────────────────
-const BACKEND_URL = 'https://api.anthropic.com/v1/messages';
-// This game uses the Anthropic storage API via window.storage when run inside Claude.
-// When hosted standalone, replace the storage calls below with your own backend (e.g. Firebase, Supabase).
-
 const FRUITS=['APPLE','BANANA','ORANGE','GRAPE','MANGO','STRAWBERRY','WATERMELON','PINEAPPLE','CHERRY','PEACH','KIWI','PAPAYA','LEMON','LIME','PLUM'];
-const POLL=1500;
+const POLL_MS=1300;
+
 let G={room:null,name:null,isHost:false,isImp:false,phase:'home',voted:false,selVote:null};
 let poller=null;
+let calcLock=false;
 
-// ─── Storage helpers ──────────────────────────────────────
-// Uses window.storage (Claude artifact storage) if available,
-// otherwise falls back to a simple in-memory store for local testing.
-const mem={};
+/* ── Storage ── */
+const _mem={};
 const store={
   async get(k){
-    if(window.storage){try{const r=await window.storage.get(k,true);return r?JSON.parse(r.value):null;}catch{return null;}}
-    return mem[k]?JSON.parse(mem[k]):null;
+    if(typeof window.storage!=='undefined'){
+      try{const r=await window.storage.get(k,true);return r?JSON.parse(r.value):null;}catch{return null;}
+    }
+    return _mem[k]!==undefined?JSON.parse(_mem[k]):null;
   },
   async set(k,v){
     const s=JSON.stringify(v);
-    if(window.storage){try{await window.storage.set(k,s,true);}catch{}}
-    mem[k]=s;
+    if(typeof window.storage!=='undefined'){try{await window.storage.set(k,s,true);}catch{}}
+    _mem[k]=s;
   },
   async del(k){
-    if(window.storage){try{await window.storage.delete(k,true);}catch{}}
-    delete mem[k];
+    if(typeof window.storage!=='undefined'){try{await window.storage.delete(k,true);}catch{}}
+    delete _mem[k];
   }
 };
 
-async function getRoom(){return store.get('room:'+G.room);}
-async function saveRoom(room){await store.set('room:'+G.room,room);}
+const rk=()=>'room:'+G.room;
+async function getRoom(){return store.get(rk());}
+async function saveRoom(r){await store.set(rk(),r);}
 
-// ─── Navigation ───────────────────────────────────────────
 function go(id){
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('on'));
   document.getElementById(id).classList.add('on');
 }
 
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
 function genCode(){return Math.floor(100000+Math.random()*900000).toString();}
 
-// ─── Create room ─────────────────────────────────────────
+/* ══════════════════════════
+   CREATE ROOM
+══════════════════════════ */
 async function createRoom(){
   const name=document.getElementById('hName').value.trim();
   const err=document.getElementById('hErr');
@@ -221,140 +416,260 @@ async function createRoom(){
     word:'',impostorName:'',
     messages:[],votes:{},eliminated:[],
     currentRound:1,maxRounds:3,currentTurnIndex:0,
-    tieResult:false,eliminatedPlayer:'',wasImpostor:false
+    tieResult:false,eliminatedPlayer:'',wasImpostor:false,
+    sysLog:[]
   };
   G={room:code,name,isHost:true,isImp:false,phase:'lobby',voted:false,selVote:null};
-  await store.set('room:'+code,room);
-  loadLobby(room);
-  go('sLobby');
+  await store.set(rk(),room);
+  renderHostLobby(room);
+  go('sHostLobby');
   startPoll();
 }
 
-// ─── Join room ────────────────────────────────────────────
+/* ══════════════════════════
+   JOIN ROOM
+══════════════════════════ */
 async function joinRoom(){
   const name=document.getElementById('jName').value.trim();
   const code=document.getElementById('jCode').value.trim().replace(/\s/g,'');
   const err=document.getElementById('jErr');
   err.textContent='';
   if(!name){err.textContent='Enter your name';return;}
-  if(code.length!==6){err.textContent='Enter a valid 6-digit code';return;}
+  if(code.length!==6){err.textContent='Enter a 6-digit code';return;}
   const room=await store.get('room:'+code);
   if(!room){err.textContent='Room not found — check the code';return;}
-  if(room.started){err.textContent='Game already started';return;}
-  if(room.players.find(p=>p.name===name)){err.textContent='That name is already taken in this room';return;}
+  if(room.started&&room.phase!=='lobby'){err.textContent='Game already in progress';return;}
+  if(room.players.find(p=>p.name===name)){err.textContent='Name already taken in this room';return;}
   room.players.push({name,id:Date.now()});
   await store.set('room:'+code,room);
   G={room:code,name,isHost:false,isImp:false,phase:'lobby',voted:false,selVote:null};
-  loadLobby(room);
-  go('sLobby');
+  renderPlayerLobby(room);
+  go('sPlayerLobby');
   startPoll();
 }
 
-// ─── Lobby ────────────────────────────────────────────────
-function loadLobby(room){
-  document.getElementById('lCode').textContent=room.code;
-  document.getElementById('lCount').textContent=room.players.length;
-  document.getElementById('lPlayers').innerHTML=room.players
-    .map(p=>`<div class="player-row"><span>${p.name}</span>${p.name===room.host?'<span class="pill">Host</span>':''}</div>`)
-    .join('');
-  if(G.isHost){
-    document.getElementById('lHostCtrl').style.display='block';
-    document.getElementById('lWait').style.display='none';
-  } else {
-    document.getElementById('lHostCtrl').style.display='none';
-    document.getElementById('lWait').style.display='block';
-  }
-}
-
-// ─── Polling ──────────────────────────────────────────────
+/* ══════════════════════════
+   POLLING
+══════════════════════════ */
 function startPoll(){
   if(poller)clearInterval(poller);
-  poller=setInterval(poll,POLL);
+  poller=setInterval(poll,POLL_MS);
 }
 
 async function poll(){
   const room=await getRoom();
   if(!room){clearInterval(poller);alert('Room was closed.');resetHome();return;}
-  if(G.phase==='lobby'){
-    loadLobby(room);
-    if(room.started&&room.phase==='countdown'){clearInterval(poller);G.phase='countdown';beginCountdown(room);}
-  } else if(G.phase==='discussion'){
-    updateDiscussion(room);
-    if(room.phase==='voting'){G.phase='voting';go('sVote');renderVote(room);}
-  } else if(G.phase==='voting'){
-    if(room.phase==='results'){G.phase='results';showResults(room);}
-    else if(G.voted){checkAllVoted(room);}
+
+  if(G.isHost){
+    if(G.phase==='lobby') renderHostLobby(room);
+    else if(G.phase==='game') refreshHostGame(room);
+    // results handled directly
+  } else {
+    if(G.phase==='lobby'){
+      renderPlayerLobby(room);
+      if(room.started&&room.phase==='countdown'){
+        clearInterval(poller);G.phase='countdown';playerCountdown(room);
+      }
+    } else if(G.phase==='discussion'){
+      refreshPlayerDiscuss(room);
+      if(room.phase==='voting'){G.phase='voting';go('sPlayerVote');renderPlayerVote(room);}
+      if(room.phase==='results'){G.phase='results';showPlayerResults(room);}
+    } else if(G.phase==='voting'){
+      if(room.phase==='results'){G.phase='results';showPlayerResults(room);}
+      else if(G.voted) maybeCalc(room);
+    }
   }
 }
 
-// ─── Start game (host only) ───────────────────────────────
+/* ══════════════════════════
+   HOST LOBBY
+══════════════════════════ */
+function renderHostLobby(room){
+  document.getElementById('hlCode').textContent=room.code;
+  document.getElementById('hlCount').textContent=room.players.length;
+  document.getElementById('hlPlayers').innerHTML=room.players.map(p=>
+    `<div class="p-card" style="margin-bottom:6px">
+      <div class="pn">${esc(p.name)}</div>
+      <div class="pm">${p.name===room.host?'<span class="pill host">Host</span>':''}</div>
+    </div>`
+  ).join('');
+  const btn=document.getElementById('hlStartBtn');
+  const need=3-room.players.length;
+  if(need<=0){btn.disabled=false;btn.textContent='Start game';}
+  else{btn.disabled=true;btn.textContent=`Need ${need} more player${need===1?'':'s'}`;}
+}
+
+/* ══════════════════════════
+   START GAME
+══════════════════════════ */
 async function startGame(){
   const room=await getRoom();if(!room)return;
-  if(room.players.length<3){alert('Need at least 3 players to start!');return;}
-  const maxRounds=parseInt(document.getElementById('lRounds').value);
+  if(room.players.length<3){return;}
+  const maxRounds=parseInt(document.getElementById('hlRounds').value);
   const word=FRUITS[Math.floor(Math.random()*FRUITS.length)];
   const imp=room.players[Math.floor(Math.random()*room.players.length)];
   Object.assign(room,{
     started:true,word,impostorName:imp.name,
     phase:'countdown',maxRounds,currentRound:1,
     currentTurnIndex:0,messages:[],votes:{},eliminated:[],
-    tieResult:false,eliminatedPlayer:'',wasImpostor:false
+    tieResult:false,eliminatedPlayer:'',wasImpostor:false,
+    sysLog:[{text:'Game started — players memorising words...'}]
   });
   await saveRoom(room);
   clearInterval(poller);
-  G.phase='countdown';
-  G.isImp=G.name===imp.name;
-  beginCountdown(room);
+  G.phase='game';G.isImp=G.name===imp.name;
+  // Show hub immediately, transition to discussion after 11s
+  renderHostHub(room);
+  go('sHostGame');
+  setTimeout(async()=>{
+    const r=await getRoom();
+    if(r&&r.phase==='countdown'){r.phase='discussion';await saveRoom(r);refreshHostGame(r);}
+    startPoll();
+  },11000);
 }
 
-// ─── Countdown ────────────────────────────────────────────
-function beginCountdown(room){
-  G.isImp=G.name===room.impostorName;
-  const wd=document.getElementById('cdWord');
-  if(G.isImp){
-    wd.className='word-reveal imp';
-    wd.innerHTML='<div class="wlabel">Your role</div><div class="word">IMPOSTOR</div>';
-  } else {
-    wd.className='word-reveal';
-    wd.innerHTML='<div class="wlabel">Your word</div><div class="word">'+room.word+'</div>';
+/* ══════════════════════════
+   HOST GAME HUB
+══════════════════════════ */
+function renderHostHub(room){
+  document.getElementById('hgCode').textContent=room.code;
+  document.getElementById('hgWord').textContent='WORD: '+room.word;
+  refreshHostGame(room);
+}
+
+function refreshHostGame(room){
+  document.getElementById('hgPhase').textContent=room.phase.toUpperCase();
+  document.getElementById('hgRound').textContent=`${room.currentRound}/${room.maxRounds}`;
+  document.getElementById('hgMsgs').textContent=room.messages.length;
+  const votes=room.votes||{};
+  const vCount=Object.keys(votes).length;
+  document.getElementById('hgVotes').textContent=vCount;
+
+  const active=room.players.filter(p=>!room.eliminated.includes(p.name));
+  const curIdx=room.phase==='discussion'?room.currentTurnIndex%active.length:-1;
+  const curName=active[curIdx]?active[curIdx].name:'';
+
+  // vote counts
+  const vc={};Object.values(votes).forEach(v=>{vc[v]=(vc[v]||0)+1;});
+
+  // sidebar
+  document.getElementById('hgPlayers').innerHTML=room.players.map(p=>{
+    const speaking=p.name===curName&&room.phase==='discussion';
+    const elim=room.eliminated.includes(p.name);
+    const isImp=p.name===room.impostorName;
+    const votesFor=vc[p.name]||0;
+    const hasVoted=votes[p.name];
+    return `<div class="p-card${speaking?' speaking':''}${elim?' elimed':''}" style="margin-bottom:6px">
+      <div class="pn">${esc(p.name)}</div>
+      <div class="pm">
+        ${isImp?'<span class="pill imp">IMPOSTOR</span>':'<span class="pill safe">safe</span>'}
+        ${elim?'<span class="pill elim">out</span>':''}
+        ${!elim&&room.phase==='voting'&&hasVoted?'<span class="pill voted">voted</span>':''}
+        ${votesFor>0?`<span class="vote-ct">▲${votesFor}</span>`:''}
+      </div>
+    </div>`;
+  }).join('');
+
+  // turn / vote panels
+  if(room.phase==='discussion'||room.phase==='countdown'){
+    document.getElementById('hgTurnPanel').style.display='block';
+    document.getElementById('hgTurnName').textContent=room.phase==='countdown'?'Countdown...':(curName||'—');
+    document.getElementById('hgVotePanel').style.display='none';
+  } else if(room.phase==='voting'){
+    document.getElementById('hgTurnPanel').style.display='none';
+    document.getElementById('hgVotePanel').style.display='block';
+    document.getElementById('hgTally').innerHTML=active.map(p=>{
+      const v=vc[p.name]||0;
+      const pct=active.length?Math.round(v/active.length*100):0;
+      return `<div class="vbar-row">
+        <span class="vbar-label">${esc(p.name)}</span>
+        <div class="vbar-track"><div class="vbar-fill" style="width:${pct}%"></div></div>
+        <span class="vbar-n">${v}</span>
+      </div>`;
+    }).join('');
+    const fb=document.getElementById('hgForceBtn');
+    fb.style.display=vCount>0?'block':'none';
+    fb.textContent=vCount>=active.length?'Calculate results now':`Force results (${vCount}/${active.length} voted)`;
+    if(vCount>=active.length) calcResults();
   }
-  go('sCountdown');
-  let t=10;
-  document.getElementById('cdNum').textContent=t;
-  const ci=setInterval(async()=>{
-    t--;
-    document.getElementById('cdNum').textContent=t;
+
+  // feed
+  const feed=document.getElementById('hgFeed');
+  const items=[
+    ...(room.sysLog||[]).map(e=>({sys:true,text:e.text})),
+    ...room.messages.map(m=>({sys:false,author:m.a,text:m.t}))
+  ];
+  feed.innerHTML=items.map(i=>i.sys
+    ?`<div class="fmsg sys"><div class="ft">${esc(i.text)}</div></div>`
+    :`<div class="fmsg"><div class="fa">${esc(i.author)}</div><div class="ft">${esc(i.text)}</div></div>`
+  ).join('');
+  feed.scrollTop=feed.scrollHeight;
+
+  if(room.phase==='results'){G.phase='results';showHostResults(room);}
+}
+
+async function forceResults(){await calcResults();}
+
+/* ══════════════════════════
+   PLAYER LOBBY
+══════════════════════════ */
+function renderPlayerLobby(room){
+  document.getElementById('plCode').textContent=room.code;
+  document.getElementById('plPlayers').innerHTML=room.players.map(p=>
+    `<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--b)">
+      <span style="font-size:14px">${esc(p.name)}</span>
+      ${p.name===room.host?'<span class="pill host">Host</span>':''}
+    </div>`
+  ).join('');
+}
+
+/* ══════════════════════════
+   PLAYER COUNTDOWN
+══════════════════════════ */
+function playerCountdown(room){
+  G.isImp=G.name===room.impostorName;
+  const wd=document.getElementById('pcWord');
+  wd.className=G.isImp?'word-card imp':'word-card';
+  wd.innerHTML=G.isImp
+    ?'<div class="wl">Your role</div><div class="w">IMPOSTOR</div>'
+    :`<div class="wl">Your word</div><div class="w">${esc(room.word)}</div>`;
+  go('sPlayerCountdown');
+  let t=10;document.getElementById('pcNum').textContent=t;
+  const ci=setInterval(()=>{
+    t--;document.getElementById('pcNum').textContent=t;
     if(t<=0){
-      clearInterval(ci);
-      if(G.isHost){const r=await getRoom();if(r){r.phase='discussion';await saveRoom(r);}}
-      G.phase='discussion';
-      go('sDiscuss');
-      const r=await getRoom();if(r)updateDiscussion(r);
+      clearInterval(ci);G.phase='discussion';
+      go('sPlayerDiscuss');
+      getRoom().then(r=>{if(r)refreshPlayerDiscuss(r);});
       startPoll();
     }
   },1000);
 }
 
-// ─── Discussion ───────────────────────────────────────────
-function updateDiscussion(room){
-  document.getElementById('dRound').textContent=`Round ${room.currentRound}/${room.maxRounds}`;
+/* ══════════════════════════
+   PLAYER DISCUSSION
+══════════════════════════ */
+function refreshPlayerDiscuss(room){
+  document.getElementById('pdRound').textContent=`Round ${room.currentRound}/${room.maxRounds}`;
   const active=room.players.filter(p=>!room.eliminated.includes(p.name));
   const cur=active[room.currentTurnIndex%active.length];
   const mine=cur&&cur.name===G.name;
-  const dT=document.getElementById('dTurn');
-  dT.textContent=mine?'Your turn to speak!':(cur?cur.name+"'s turn to speak":'...');
-  dT.className='turn-bar'+(mine?' mine':'');
-  document.getElementById('dInput').style.display=mine?'block':'none';
-  document.getElementById('dWait').style.display=mine?'none':'block';
-  const mc=document.getElementById('dMsgs');
-  mc.innerHTML=room.messages.map(m=>`<div class="msg"><div class="ma">${esc(m.a)}</div><div class="mt">${esc(m.t)}</div></div>`).join('');
+  const tb=document.getElementById('pdTurn');
+  tb.textContent=mine?'Your turn to speak!':(cur?`${cur.name}'s turn`:'...');
+  tb.className='turn-banner'+(mine?' mine':'');
+  document.getElementById('pdInput').style.display=mine?'block':'none';
+  document.getElementById('pdWait').style.display=mine?'none':'block';
+  const mc=document.getElementById('pdMsgs');
+  mc.innerHTML=room.messages.map(m=>
+    `<div class="msg"><div class="ma">${esc(m.a)}</div><div class="mt">${esc(m.t)}</div></div>`
+  ).join('');
   mc.scrollTop=mc.scrollHeight;
 }
 
 async function sendMsg(){
-  const txt=document.getElementById('dText').value.trim();
+  const txt=document.getElementById('pdText').value.trim();
   if(!txt)return;
-  document.getElementById('dText').value='';
+  document.getElementById('pdText').value='';
   const room=await getRoom();if(!room)return;
   room.messages.push({a:G.name,t:txt});
   room.currentTurnIndex++;
@@ -364,105 +679,146 @@ async function sendMsg(){
     else{room.currentRound++;}
   }
   await saveRoom(room);
-  updateDiscussion(room);
-  if(room.phase==='voting'){G.phase='voting';go('sVote');renderVote(room);}
+  refreshPlayerDiscuss(room);
+  if(room.phase==='voting'){G.phase='voting';go('sPlayerVote');renderPlayerVote(room);}
 }
 
-// ─── Voting ───────────────────────────────────────────────
-function renderVote(room){
+/* ══════════════════════════
+   PLAYER VOTE
+══════════════════════════ */
+function renderPlayerVote(room){
   const active=room.players.filter(p=>!room.eliminated.includes(p.name));
-  document.getElementById('vOptions').innerHTML=active
-    .map(p=>`<div class="vote-opt" id="vo_${p.name}" onclick="selVote('${p.name}')">${esc(p.name)}</div>`)
-    .join('');
-  const btn=document.getElementById('vBtn');
-  btn.disabled=false;btn.textContent='Submit vote';
-  document.getElementById('vWait').style.display='none';
-  document.getElementById('vErr').textContent='';
+  document.getElementById('pvOptions').innerHTML=active.map(p=>
+    `<div class="vopt" id="pvo_${esc(p.name)}" onclick="selVote('${esc(p.name)}')">${esc(p.name)}</div>`
+  ).join('');
+  document.getElementById('pvBtn').disabled=false;
+  document.getElementById('pvBtn').textContent='Submit vote';
+  document.getElementById('pvWait').style.display='none';
+  document.getElementById('pvErr').textContent='';
   G.voted=false;G.selVote=null;
 }
 
 function selVote(name){
   G.selVote=name;
-  document.querySelectorAll('.vote-opt').forEach(o=>o.classList.remove('sel'));
-  const el=document.getElementById('vo_'+name);if(el)el.classList.add('sel');
+  document.querySelectorAll('.vopt').forEach(o=>o.classList.remove('sel'));
+  const el=document.getElementById('pvo_'+name);if(el)el.classList.add('sel');
 }
 
 async function submitVote(){
-  if(!G.selVote){document.getElementById('vErr').textContent='Select a player first';return;}
-  document.getElementById('vErr').textContent='';
+  if(!G.selVote){document.getElementById('pvErr').textContent='Select a player first';return;}
+  document.getElementById('pvErr').textContent='';
   const room=await getRoom();if(!room)return;
   if(!room.votes)room.votes={};
-  room.votes[G.name]=G.selVote;
-  G.voted=true;
+  room.votes[G.name]=G.selVote;G.voted=true;
   await saveRoom(room);
-  const btn=document.getElementById('vBtn');
-  btn.disabled=true;btn.textContent='Voted ✓';
-  document.getElementById('vWait').style.display='block';
-  checkAllVoted(room);
+  document.getElementById('pvBtn').disabled=true;
+  document.getElementById('pvBtn').textContent='Voted ✓';
+  document.getElementById('pvWait').style.display='block';
+  maybeCalc(room);
 }
 
-async function checkAllVoted(room){
+async function maybeCalc(room){
   const active=room.players.filter(p=>!room.eliminated.includes(p.name));
-  if(Object.keys(room.votes||{}).length>=active.length&&G.isHost){
-    await calcResults();
-  }
+  if(Object.keys(room.votes||{}).length>=active.length) calcResults();
 }
 
+/* ══════════════════════════
+   CALCULATE RESULTS (host)
+══════════════════════════ */
 async function calcResults(){
-  const room=await getRoom();if(!room)return;
-  const vc={};
-  Object.values(room.votes).forEach(v=>{vc[v]=(vc[v]||0)+1;});
-  let mx=0,elim=[];
-  Object.entries(vc).forEach(([p,c])=>{if(c>mx){mx=c;elim=[p];}else if(c===mx){elim.push(p);}});
-  if(elim.length>1){
-    room.tieResult=true;room.currentRound++;
-    room.currentTurnIndex=0;room.messages=[];room.votes={};room.phase='discussion';
-  } else {
-    room.eliminatedPlayer=elim[0];
-    room.eliminated.push(elim[0]);
-    room.wasImpostor=elim[0]===room.impostorName;
-    room.tieResult=false;room.phase='results';
-  }
-  await saveRoom(room);
-  if(room.phase==='results'){G.phase='results';showResults(room);}
-  else{G.phase='discussion';go('sDiscuss');const r=await getRoom();if(r)updateDiscussion(r);startPoll();}
-}
-
-// ─── Results ──────────────────────────────────────────────
-function showResults(room){
-  go('sResults');
-  if(room.tieResult){
-    document.getElementById('rMain').className='res-card';
-    document.getElementById('rMain').innerHTML='<div class="res-big">Tie!</div><p style="color:var(--t2)">No one eliminated — another discussion starts.</p>';
-    document.getElementById('rReveal').style.display='none';
-    document.getElementById('rBtn').textContent='Start next round';
-  } else {
-    document.getElementById('rReveal').style.display='block';
-    document.getElementById('rImpName').textContent=room.impostorName;
-    document.getElementById('rWord').textContent=room.word;
-    if(room.wasImpostor){
-      document.getElementById('rMain').className='res-card win';
-      document.getElementById('rMain').innerHTML=`<div class="res-big">Impostor caught!</div><p><strong>${esc(room.eliminatedPlayer)}</strong> was the impostor. Team wins!</p>`;
+  if(calcLock)return;calcLock=true;
+  try{
+    const room=await getRoom();
+    if(!room||room.phase==='results'){calcLock=false;return;}
+    const active=room.players.filter(p=>!room.eliminated.includes(p.name));
+    const vc={};Object.values(room.votes||{}).forEach(v=>{vc[v]=(vc[v]||0)+1;});
+    let mx=0,elim=[];
+    Object.entries(vc).forEach(([p,c])=>{if(c>mx){mx=c;elim=[p];}else if(c===mx){elim.push(p);}});
+    if(elim.length>1){
+      room.tieResult=true;room.currentRound++;
+      room.currentTurnIndex=0;room.messages=[];room.votes={};room.phase='discussion';
+      room.sysLog.push({text:`Tie! Starting round ${room.currentRound}...`});
     } else {
-      document.getElementById('rMain').className='res-card lose';
-      document.getElementById('rMain').innerHTML=`<div class="res-big">Wrong call...</div><p><strong>${esc(room.eliminatedPlayer)}</strong> was innocent. The impostor escapes!</p>`;
+      room.eliminatedPlayer=elim[0];
+      room.eliminated.push(elim[0]);
+      room.wasImpostor=elim[0]===room.impostorName;
+      room.tieResult=false;room.phase='results';
+      room.sysLog.push({text:`${elim[0]} was eliminated by vote.`});
     }
-    document.getElementById('rBtn').textContent='Back to lobby';
-  }
-}
-
-async function contResults(){
-  const room=await getRoom();if(!room)return;
-  if(room.tieResult){
-    room.tieResult=false;room.phase='discussion';
     await saveRoom(room);
-    G.phase='discussion';go('sDiscuss');updateDiscussion(room);startPoll();
+    if(G.isHost){
+      if(room.phase==='results'){G.phase='results';showHostResults(room);}
+      else{refreshHostGame(room);}
+    }
+  }finally{calcLock=false;}
+}
+
+/* ══════════════════════════
+   HOST RESULTS
+══════════════════════════ */
+function showHostResults(room){
+  go('sHostResults');
+  document.getElementById('hrCode').textContent=room.code;
+  document.getElementById('hrImpName').textContent=room.impostorName;
+  document.getElementById('hrWord').textContent=room.word;
+  const main=document.getElementById('hrMain');
+  if(room.wasImpostor){
+    main.innerHTML=`<div class="ptitle">Outcome</div>
+      <div style="font-family:'Syne',sans-serif;font-size:1.8rem;font-weight:800;color:var(--green-mid);margin-bottom:10px">Impostor caught!</div>
+      <p style="color:var(--t2);font-size:14px;line-height:1.7"><strong style="color:var(--t)">${esc(room.eliminatedPlayer)}</strong> was voted out — and they were the impostor. Team wins!</p>`;
   } else {
-    await leaveRoom();
+    main.innerHTML=`<div class="ptitle">Outcome</div>
+      <div style="font-family:'Syne',sans-serif;font-size:1.8rem;font-weight:800;color:var(--red);margin-bottom:10px">Wrong call!</div>
+      <p style="color:var(--t2);font-size:14px;line-height:1.7"><strong style="color:var(--t)">${esc(room.eliminatedPlayer)}</strong> was innocent. The impostor escapes!</p>`;
+  }
+  const vc={};Object.values(room.votes||{}).forEach(v=>{vc[v]=(vc[v]||0)+1;});
+  document.getElementById('hrVotes').innerHTML=Object.entries(vc).map(([p,c])=>
+    `<span style="background:rgba(255,255,255,.15);color:#fff;padding:4px 10px;border-radius:6px;font-size:12px;font-family:'DM Mono',monospace">${esc(p)} ▲${c}</span>`
+  ).join('');
+}
+
+/* ══════════════════════════
+   PLAYER RESULTS
+══════════════════════════ */
+function showPlayerResults(room){
+  go('sPlayerResults');
+  document.getElementById('prReveal').style.display='block';
+  document.getElementById('prImpName').textContent=room.impostorName;
+  document.getElementById('prWord').textContent=room.word;
+  const main=document.getElementById('prMain');
+  if(room.wasImpostor){
+    main.className='res-card win';
+    main.innerHTML=`<div class="res-big" style="color:var(--green-mid)">Impostor caught!</div><p style="color:var(--t2);font-size:14px"><strong style="color:var(--t)">${esc(room.eliminatedPlayer)}</strong> was the impostor. Team wins!</p>`;
+  } else {
+    main.className='res-card lose';
+    main.innerHTML=`<div class="res-big" style="color:var(--red)">Wrong call...</div><p style="color:var(--t2);font-size:14px"><strong style="color:var(--t)">${esc(room.eliminatedPlayer)}</strong> was innocent. Impostor escapes!</p>`;
   }
 }
 
-// ─── Leave / reset ────────────────────────────────────────
+/* ══════════════════════════
+   CONTINUATIONS
+══════════════════════════ */
+async function hostPlayAgain(){
+  const room=await getRoom();if(!room)return;
+  Object.assign(room,{
+    started:false,word:'',impostorName:'',phase:'lobby',
+    messages:[],votes:{},eliminated:[],currentRound:1,maxRounds:3,
+    currentTurnIndex:0,tieResult:false,eliminatedPlayer:'',wasImpostor:false,sysLog:[]
+  });
+  await saveRoom(room);
+  G.phase='lobby';renderHostLobby(room);go('sHostLobby');startPoll();
+}
+
+async function playerBackToLobby(){
+  G.phase='lobby';
+  const room=await getRoom();
+  if(room)renderPlayerLobby(room);
+  go('sPlayerLobby');startPoll();
+}
+
+/* ══════════════════════════
+   LEAVE / RESET
+══════════════════════════ */
 async function leaveRoom(){
   clearInterval(poller);
   if(G.room){
@@ -470,7 +826,7 @@ async function leaveRoom(){
       const room=await getRoom();
       if(room){
         room.players=room.players.filter(p=>p.name!==G.name);
-        if(room.players.length===0||G.isHost){await store.del('room:'+G.room);}
+        if(room.players.length===0||G.isHost){await store.del(rk());}
         else{room.host=room.players[0].name;await saveRoom(room);}
       }
     }catch{}
@@ -479,12 +835,9 @@ async function leaveRoom(){
 }
 
 function resetHome(){
+  clearInterval(poller);
   G={room:null,name:null,isHost:false,isImp:false,phase:'home',voted:false,selVote:null};
   go('sHome');
-}
-
-function esc(s){
-  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 </script>
 </body>
